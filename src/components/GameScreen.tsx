@@ -180,7 +180,14 @@ export function GameScreen({
     })
   }
 
+  const HINT_COST = 10
+
   const revealHint = () => {
+    if (progress.coins < HINT_COST) {
+      showFeedback('error', `Need ${HINT_COST} coins for a hint. Complete words to earn more.`)
+      return
+    }
+
     const hint = getHintCell(solvedLevel, levelProgress)
 
     if (!hint) {
@@ -191,6 +198,7 @@ export function GameScreen({
     setProgress((current) => ({
       ...current,
       usedHints: current.usedHints + 1,
+      coins: current.coins - HINT_COST,
       levels: {
         ...current.levels,
         [level.id]: {
