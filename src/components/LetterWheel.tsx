@@ -9,7 +9,7 @@ type LetterWheelProps = {
 }
 
 const DRAG_THRESHOLD = 8
-const LETTER_RADIUS = 38
+const LETTER_RADIUS = 42
 
 export function LetterWheel({
   letters,

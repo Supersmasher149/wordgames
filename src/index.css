@@ -232,8 +232,7 @@ p {
 
 .game-screen {
   display: grid;
-  flex-grow: 1;
-  flex-shrink: 0;
+  flex: 1 1 auto;
   gap: 0.6rem;
   grid-template-rows: auto 1fr;
   margin: 0 auto;
@@ -283,7 +282,7 @@ p {
   grid-template-rows: auto 1fr auto auto auto;
   justify-items: center;
   min-height: 0;
-  overflow: hidden;
+  overflow-x: hidden;
   padding: clamp(0.5rem, 1.5vw, 1rem);
 }
 
@@ -307,6 +306,7 @@ p {
 .crossword-panel {
   display: grid;
   max-width: 100%;
+  min-height: 0;
   overflow-x: auto;
   padding: 0.3rem;
   place-items: center;
