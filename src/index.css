@@ -101,6 +101,8 @@ p {
 }
 
 .app-shell {
+  display: flex;
+  flex-direction: column;
   height: 100svh;
   isolation: isolate;
   overflow: hidden;
@@ -226,6 +228,7 @@ p {
 
 .game-screen {
   display: grid;
+  flex-shrink: 0;
   gap: 1rem;
   grid-template-rows: auto minmax(0, 1fr);
   height: calc(100svh - 7.5rem);
@@ -511,9 +514,12 @@ p {
 .level-select {
   border-radius: 2rem;
   display: grid;
+  flex: 1;
   gap: 1.3rem;
   margin: 0 auto;
   max-width: 1120px;
+  min-height: 0;
+  overflow-y: auto;
   padding: clamp(1.2rem, 3vw, 2rem);
 }
 
