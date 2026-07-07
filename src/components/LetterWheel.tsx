@@ -3,21 +3,28 @@ import { useEffect, useRef, useState } from 'react'
 type LetterWheelProps = {
   letters: string[]
   status: 'idle' | 'success' | 'bonus' | 'error'
+  animationKey: number
   onSubmit: (word: string) => void
   onWordChange: (word: string) => void
 }
 
+const DRAG_THRESHOLD = 8
+const LETTER_RADIUS = 42
+
 export function LetterWheel({
   letters,
   status,
+  animationKey,
   onSubmit,
   onWordChange,
 }: LetterWheelProps) {
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
-  const [isDragging, setIsDragging] = useState(false)
   const wheelRef = useRef<HTMLDivElement | null>(null)
   const selectedRef = useRef<number[]>([])
   const movedRef = useRef(false)
+  const isDraggingRef = useRef(false)
+  const startIndexRef = useRef<number | null>(null)
+  const startedSelectedRef = useRef(false)
   const startRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
@@ -25,21 +32,36 @@ export function LetterWheel({
     onWordChange(selectedIndexes.map((index) => letters[index]).join(''))
   }, [letters, onWordChange, selectedIndexes])
 
+  useEffect(
+    () => () => {
+      document.body.classList.remove('is-wheel-dragging')
+    },
+    [],
+  )
+
   useEffect(() => {
-    setSelectedIndexes([])
+    commitSelection([])
   }, [letters])
+
+  const commitSelection = (indexes: number[]) => {
+    selectedRef.current = indexes
+    setSelectedIndexes(indexes)
+  }
+
+  const syncSelection = (indexes: number[]) => {
+    selectedRef.current = indexes
+    return indexes
+  }
 
   const addIndex = (index: number) => {
     setSelectedIndexes((current) =>
-      current.includes(index) ? current : [...current, index],
+      current.includes(index) ? current : syncSelection([...current, index]),
     )
   }
 
-  const toggleIndex = (index: number) => {
+  const removeIndex = (index: number) => {
     setSelectedIndexes((current) =>
-      current.includes(index)
-        ? current.filter((selectedIndex) => selectedIndex !== index)
-        : [...current, index],
+      syncSelection(current.filter((selectedIndex) => selectedIndex !== index)),
     )
   }
 
@@ -50,7 +72,7 @@ export function LetterWheel({
       onSubmit(word)
     }
 
-    setSelectedIndexes([])
+    commitSelection([])
   }
 
   const handlePointerDown = (
@@ -59,21 +81,29 @@ export function LetterWheel({
   ) => {
     event.preventDefault()
     wheelRef.current?.setPointerCapture(event.pointerId)
+    document.body.classList.add('is-wheel-dragging')
     startRef.current = { x: event.clientX, y: event.clientY }
+    startIndexRef.current = index
+    startedSelectedRef.current = selectedRef.current.includes(index)
     movedRef.current = false
-    setIsDragging(true)
-    toggleIndex(index)
+    isDraggingRef.current = true
+
+    if (!startedSelectedRef.current) {
+      addIndex(index)
+    }
   }
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging) {
+    if (!isDraggingRef.current) {
       return
     }
+
+    event.preventDefault()
 
     const dx = event.clientX - startRef.current.x
     const dy = event.clientY - startRef.current.y
 
-    if (Math.hypot(dx, dy) > 8) {
+    if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
       movedRef.current = true
     }
 
@@ -86,22 +116,34 @@ export function LetterWheel({
   }
 
   const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging) {
+    if (!isDraggingRef.current) {
       return
     }
+
+    event.preventDefault()
 
     if (wheelRef.current?.hasPointerCapture(event.pointerId)) {
       wheelRef.current.releasePointerCapture(event.pointerId)
     }
 
-    setIsDragging(false)
+    document.body.classList.remove('is-wheel-dragging')
+    isDraggingRef.current = false
 
     if (movedRef.current && selectedRef.current.length > 1) {
       submitSelected()
+    } else if (startIndexRef.current !== null && startedSelectedRef.current) {
+      removeIndex(startIndexRef.current)
     }
+
+    startIndexRef.current = null
   }
 
   const selectedWord = selectedIndexes.map((index) => letters[index]).join('')
+  const positions = letters.map((_, index) => getLetterPosition(index, letters.length))
+  const selectedPoints = selectedIndexes
+    .map((index) => positions[index])
+    .map((position) => `${position.x},${position.y}`)
+    .join(' ')
 
   return (
     <section className={`wheel-panel ${status}`} aria-label="Letter wheel">
@@ -111,17 +153,18 @@ export function LetterWheel({
 
       <div
         className="letter-wheel"
+        key={`wheel-${animationKey}`}
         ref={wheelRef}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
         <div className="wheel-orbit" aria-hidden="true" />
+        <svg className="selection-path" viewBox="0 0 100 100" aria-hidden="true">
+          {selectedPoints && <polyline points={selectedPoints} />}
+        </svg>
         {letters.map((letter, index) => {
-          const angle = (Math.PI * 2 * index) / letters.length - Math.PI / 2
-          const radius = 42
-          const x = 50 + Math.cos(angle) * radius
-          const y = 50 + Math.sin(angle) * radius
+          const { x, y } = positions[index]
           const selectedOrder = selectedIndexes.indexOf(index)
 
           return (
@@ -143,7 +186,7 @@ export function LetterWheel({
       </div>
 
       <div className="tap-actions" aria-label="Tap input actions">
-        <button type="button" onClick={() => setSelectedIndexes([])}>
+        <button type="button" onClick={() => commitSelection([])}>
           Clear
         </button>
         <button type="button" onClick={submitSelected}>
@@ -152,4 +195,13 @@ export function LetterWheel({
       </div>
     </section>
   )
+}
+
+function getLetterPosition(index: number, total: number) {
+  const angle = (Math.PI * 2 * index) / total - Math.PI / 2
+
+  return {
+    x: 50 + Math.cos(angle) * LETTER_RADIUS,
+    y: 50 + Math.sin(angle) * LETTER_RADIUS,
+  }
 }

@@ -22,6 +22,7 @@ type GameScreenProps = {
 }
 
 type Feedback = {
+  id: number
   status: 'idle' | 'success' | 'bonus' | 'error'
   message: string
 }
@@ -36,9 +37,11 @@ export function GameScreen({
   const [wheelLetters, setWheelLetters] = useState(level.letters)
   const [selectedWord, setSelectedWord] = useState('')
   const [feedback, setFeedback] = useState<Feedback>({
+    id: 0,
     status: 'idle',
     message: 'Find every word in the grid.',
   })
+  const [recentWord, setRecentWord] = useState<string | null>(null)
   const [showComplete, setShowComplete] = useState(false)
   const levelProgress = getLevelProgress(progress, level.id)
   const foundCount = levelProgress.foundWords.length
@@ -47,9 +50,18 @@ export function GameScreen({
   useEffect(() => {
     setWheelLetters(level.letters)
     setSelectedWord('')
-    setFeedback({ status: 'idle', message: 'Find every word in the grid.' })
+    setRecentWord(null)
+    setFeedback((current) => ({
+      id: current.id + 1,
+      status: 'idle',
+      message: 'Find every word in the grid.',
+    }))
     setShowComplete(false)
   }, [level])
+
+  const showFeedback = (status: Feedback['status'], message: string) => {
+    setFeedback((current) => ({ id: current.id + 1, status, message }))
+  }
 
   const submitWord = (rawWord: string) => {
     const result = evaluateSubmission(level, levelProgress, rawWord)
@@ -74,7 +86,11 @@ export function GameScreen({
         },
       }))
 
-      setFeedback({ status: 'success', message: `${result.word} fills the grid.` })
+      setRecentWord(result.word)
+      window.setTimeout(() => {
+        setRecentWord((current) => (current === result.word ? null : current))
+      }, 950)
+      showFeedback('success', `${result.word} fills the grid.`)
       playSound(completed ? 'complete' : 'correct', progress.muted)
 
       if (completed) {
@@ -96,15 +112,17 @@ export function GameScreen({
           },
         },
       }))
-      setFeedback({ status: 'bonus', message: `Bonus word: +${result.coins} coins.` })
+      showFeedback('bonus', `${result.word} is a bonus word: +${result.coins} coins.`)
       playSound('bonus', progress.muted)
       return
     }
 
-    setFeedback({
-      status: 'error',
-      message: result.kind === 'duplicate' ? 'Already found.' : 'Not in this puzzle.',
-    })
+    showFeedback(
+      'error',
+      result.kind === 'duplicate'
+        ? `${result.word} was already found. Try a new word.`
+        : `${result.word || 'That'} is not in this puzzle.`,
+    )
     playSound('invalid', progress.muted)
   }
 
@@ -125,7 +143,7 @@ export function GameScreen({
     const hint = getHintCell(level, levelProgress)
 
     if (!hint) {
-      setFeedback({ status: 'idle', message: 'Every visible clue is already revealed.' })
+      showFeedback('idle', 'Every visible clue is already revealed.')
       return
     }
 
@@ -140,7 +158,7 @@ export function GameScreen({
         },
       },
     }))
-    setFeedback({ status: 'success', message: 'A hidden letter catches the light.' })
+    showFeedback('success', 'A hidden letter catches the light.')
     playSound('hint', progress.muted)
   }
 
@@ -175,7 +193,7 @@ export function GameScreen({
           <span>{progress.usedHints} hints used</span>
         </div>
 
-        <CrosswordGrid level={level} progress={levelProgress} />
+        <CrosswordGrid level={level} progress={levelProgress} recentWord={recentWord} />
 
         <div className={`feedback ${feedback.status}`} aria-live="polite">
           <strong>{selectedWord ? normalizeWord(selectedWord) : feedback.message}</strong>
@@ -192,6 +210,7 @@ export function GameScreen({
 
         <LetterWheel
           letters={wheelLetters}
+          animationKey={feedback.id}
           onSubmit={submitWord}
           onWordChange={setSelectedWord}
           status={feedback.status}

@@ -123,14 +123,14 @@ export function getHintCell(
   return { row: randomCell.row, col: randomCell.col }
 }
 
-function getPlacementCells(placement: WordPlacement): RevealedCell[] {
+export function getPlacementCells(placement: WordPlacement): RevealedCell[] {
   return normalizeWord(placement.word).split('').map((_, index) => ({
     row: placement.row + (placement.direction === 'down' ? index : 0),
     col: placement.col + (placement.direction === 'across' ? index : 0),
   }))
 }
 
-function getCellKey(cell: RevealedCell) {
+export function getCellKey(cell: RevealedCell) {
   return `${cell.row}:${cell.col}`
 }
 

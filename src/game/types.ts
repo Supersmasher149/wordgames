@@ -1,13 +1,13 @@
 export type Direction = 'across' | 'down'
 
-export type WordPlacement = {
+export interface WordPlacement {
   word: string
   row: number
   col: number
   direction: Direction
 }
 
-export type Level = {
+export interface Level {
   id: number
   title: string
   letters: string[]
@@ -15,18 +15,18 @@ export type Level = {
   bonusWords: string[]
 }
 
-export type RevealedCell = {
+export interface RevealedCell {
   row: number
   col: number
 }
 
-export type LevelProgress = {
+export interface LevelProgress {
   foundWords: string[]
   foundBonusWords: string[]
   revealedCells: RevealedCell[]
 }
 
-export type PlayerProgress = {
+export interface PlayerProgress {
   currentLevelId: number
   completedLevelIds: number[]
   coins: number
@@ -35,7 +35,7 @@ export type PlayerProgress = {
   levels: Record<number, LevelProgress>
 }
 
-export type GridCell = {
+export interface GridCell {
   row: number
   col: number
   letter: string
@@ -44,7 +44,7 @@ export type GridCell = {
   hinted: boolean
 }
 
-export type GridView = {
+export interface GridView {
   rows: Array<Array<GridCell | null>>
   minRow: number
   minCol: number

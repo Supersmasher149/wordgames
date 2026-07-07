@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+
 type LevelCompleteModalProps = {
   title: string
   coins: number
@@ -16,9 +18,14 @@ export function LevelCompleteModal({
   return (
     <div className="modal-backdrop" role="presentation">
       <section className="complete-modal" role="dialog" aria-modal="true">
+        <div className="celebration-burst" aria-hidden="true">
+          {Array.from({ length: 10 }, (_, index) => (
+            <span key={index} style={getPetalStyle(index)} />
+          ))}
+        </div>
         <p className="eyebrow">Puzzle complete</p>
         <h2>{title}</h2>
-        <p>You cleared the board and earned a calm little victory.</p>
+        <p>You cleared the board. A new grove path is open.</p>
         <div className="reward-card">Total coins: {coins}</div>
         <div className="modal-actions">
           <button type="button" onClick={onLevels}>
@@ -33,4 +40,8 @@ export function LevelCompleteModal({
       </section>
     </div>
   )
+}
+
+function getPetalStyle(index: number) {
+  return { '--petal-index': index } as CSSProperties
 }
