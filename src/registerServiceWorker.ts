@@ -4,7 +4,7 @@ export function registerServiceWorker() {
   }
 
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
+    navigator.serviceWorker.register('/wordgames/sw.js', { scope: '/wordgames/' }).catch(() => {
       // The game remains playable online if registration is unavailable.
     })
   })

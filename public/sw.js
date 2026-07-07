@@ -1,11 +1,12 @@
-const CACHE_NAME = 'word-grove-offline-v1'
+const CACHE_NAME = 'word-grove-offline-v2'
+const BASE = '/wordgames'
 const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/favicon.svg',
-  '/icon-192.svg',
-  '/icon-512.svg',
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/manifest.webmanifest`,
+  `${BASE}/favicon.svg`,
+  `${BASE}/icon-192.svg`,
+  `${BASE}/icon-512.svg`,
 ]
 
 self.addEventListener('install', (event) => {
@@ -47,12 +48,12 @@ async function fetchNavigation(request) {
     const response = await fetch(request)
 
     if (response.ok) {
-      cache.put('/index.html', response.clone())
+      cache.put(`${BASE}/index.html`, response.clone())
     }
 
     return response
   } catch {
-    return (await cache.match('/index.html')) || (await cache.match('/')) || Response.error()
+    return (await cache.match(`${BASE}/index.html`)) || (await cache.match(`${BASE}/`)) || Response.error()
   }
 }
 
@@ -60,17 +61,17 @@ async function cacheAppShell() {
   const cache = await caches.open(CACHE_NAME)
   await cache.addAll(APP_SHELL)
 
-  const response = await fetch('/index.html', { cache: 'reload' })
+  const response = await fetch(`${BASE}/index.html`, { cache: 'reload' })
 
   if (!response.ok) {
     return
   }
 
   const html = await response.clone().text()
-  await cache.put('/index.html', response)
+  await cache.put(`${BASE}/index.html`, response)
   const assetUrls = [...html.matchAll(/(?:src|href)="([^"]+)"/g)]
     .map((match) => match[1])
-    .filter((assetUrl) => assetUrl.startsWith('/assets/'))
+    .filter((assetUrl) => assetUrl.startsWith(`${BASE}/assets/`))
 
   await cache.addAll(assetUrls)
 }
