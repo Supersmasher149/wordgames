@@ -1,0 +1,16 @@
+{
+  "name": "Word Grove",
+  "short_name": "Word Grove",
+  "description": "An original relaxing letter-wheel crossword puzzle game.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#d7eddf",
+  "theme_color": "#2f8f74",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
