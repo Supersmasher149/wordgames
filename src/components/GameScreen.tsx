@@ -13,11 +13,19 @@ import { discoverAllValidBonusWords, deduplicateAndFilterBonuses } from '../game
 import { CrosswordGrid } from './CrosswordGrid'
 import { LetterWheel } from './LetterWheel'
 import { LevelCompleteModal } from './LevelCompleteModal'
+import bookSvg from '../assets/icons/book.svg'
+import pawCoinSvg from '../assets/icons/paw-coin.svg'
+import fishBoneSvg from '../assets/icons/fish-bone.svg'
+import pawSvg from '../assets/icons/paw.svg'
+import bellSvg from '../assets/icons/bell.svg'
+import shuffleSvg from '../assets/icons/shuffle.svg'
+import lightbulbCatSvg from '../assets/icons/lightbulb-cat.svg'
 
 type GameScreenProps = {
   level: LevelData
   packId: string
   levelIndex: number
+  hasNextLevel: boolean
   progress: PlayerProgress
   setProgress: (recipe: (progress: PlayerProgress) => PlayerProgress) => void
   onOpenLevels: () => void
@@ -54,6 +62,7 @@ export function GameScreen({
   level,
   packId,
   levelIndex,
+  hasNextLevel,
   progress,
   setProgress,
   onOpenLevels,
@@ -214,23 +223,34 @@ export function GameScreen({
   return (
     <main className="game-screen">
       <section className="game-topbar">
-        <button type="button" onClick={onOpenLevels}>
-          Levels
+        <button type="button" onClick={onOpenLevels} className="levels-button">
+          <img src={bookSvg} alt="" className="btn-icon" />
+          <span>Levels</span>
         </button>
-        <div>
+        <div className="level-title-block">
           <p className="eyebrow">Level {level.id}</p>
           <h1>{level.title}</h1>
         </div>
-        <div className="coin-pill">{progress.coins} coins</div>
+        <div className="coin-pill">
+          <img src={pawCoinSvg} alt="" className="coin-icon" />
+          <span>{progress.coins}</span>
+        </div>
       </section>
 
       <section className="game-board">
-        <div className="progress-strip">
-          <span>
-            {foundCount}/{solvedLevel.words.length} words
+        <div className="stats-row">
+          <span className="stat-pill">
+            <img src={fishBoneSvg} alt="" className="stat-icon" />
+            <span>{foundCount}/{solvedLevel.words.length}</span>
           </span>
-          <span>{levelProgress.foundBonusWords.length} bonus</span>
-          <span>{progress.usedHints} hints used</span>
+          <span className="stat-pill">
+            <img src={pawSvg} alt="" className="stat-icon" />
+            <span>{levelProgress.foundBonusWords.length}</span>
+          </span>
+          <span className="stat-pill">
+            <img src={bellSvg} alt="" className="stat-icon" />
+            <span>{progress.usedHints}</span>
+          </span>
         </div>
 
         <CrosswordGrid level={solvedLevel} progress={levelProgress} recentWord={recentWord} />
@@ -240,11 +260,13 @@ export function GameScreen({
         </div>
 
         <div className="power-actions">
-          <button type="button" onClick={shuffleLetters}>
-            Shuffle
+          <button type="button" onClick={shuffleLetters} className="btn-teal">
+            <img src={shuffleSvg} alt="" className="btn-icon" />
+            <span>Shuffle</span>
           </button>
-          <button type="button" onClick={revealHint}>
-            Hint
+          <button type="button" onClick={revealHint} className="btn-coral">
+            <img src={lightbulbCatSvg} alt="" className="btn-icon" />
+            <span>Hint</span>
           </button>
         </div>
 
@@ -260,7 +282,7 @@ export function GameScreen({
       {showComplete && (
         <LevelCompleteModal
           coins={progress.coins}
-          hasNextLevel={true}
+          hasNextLevel={hasNextLevel}
           onLevels={onOpenLevels}
           onNext={onNextLevel}
           title={level.title}

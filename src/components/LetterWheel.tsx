@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import pawSvg from '../assets/icons/paw.svg'
+import checkPawSvg from '../assets/icons/check-paw.svg'
+import yarnBallSvg from '../assets/decor/yarn-ball.svg'
 
 type LetterWheelProps = {
   letters: string[]
@@ -159,10 +162,14 @@ export function LetterWheel({
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
+        <div className="yarn-ring-decor" aria-hidden="true" />
         <div className="wheel-orbit" aria-hidden="true" />
         <svg className="selection-path" viewBox="0 0 100 100" aria-hidden="true">
           {selectedPoints && <polyline points={selectedPoints} />}
         </svg>
+        <div className="wheel-center" aria-hidden="true">
+          <img src={yarnBallSvg} alt="" />
+        </div>
         {letters.map((letter, index) => {
           const { x, y } = positions[index]
           const selectedOrder = selectedIndexes.indexOf(index)
@@ -186,11 +193,13 @@ export function LetterWheel({
       </div>
 
       <div className="tap-actions" aria-label="Tap input actions">
-        <button type="button" onClick={() => commitSelection([])}>
-          Clear
+        <button type="button" onClick={() => commitSelection([])} className="btn-teal">
+          <img src={pawSvg} alt="" className="btn-icon" />
+          <span>Clear</span>
         </button>
-        <button type="button" onClick={submitSelected}>
-          Enter
+        <button type="button" onClick={submitSelected} className="btn-coral">
+          <img src={checkPawSvg} alt="" className="btn-icon" />
+          <span>Enter</span>
         </button>
       </div>
     </section>

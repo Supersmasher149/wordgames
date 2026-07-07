@@ -1,7 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Word Grove app icon">
-  <rect width="512" height="512" rx="128" fill="#d7eddf" />
-  <circle cx="162" cy="164" r="80" fill="#ffd783" />
-  <circle cx="336" cy="192" r="112" fill="#8cc98b" />
-  <path d="M112 352c64-125 200-171 309-120-54 125-202 179-309 120Z" fill="#2f8f74" />
-  <text x="256" y="318" text-anchor="middle" font-family="Arial, sans-serif" font-size="132" font-weight="800" fill="#fffaf0">WG</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Word Paws icon">
+  <rect width="512" height="512" rx="128" fill="#3aa7a3"/>
+  <path d="M128 160 Q96 80 160 128 Q144 64 208 128" fill="#237a76"/>
+  <path d="M384 160 Q416 80 352 128 Q368 64 304 128" fill="#237a76"/>
+  <ellipse cx="176" cy="240" rx="32" ry="28" fill="#fff"/>
+  <ellipse cx="336" cy="240" rx="32" ry="28" fill="#fff"/>
+  <circle cx="192" cy="240" r="16" fill="#4a2f24"/>
+  <circle cx="320" cy="240" r="16" fill="#4a2f24"/>
+  <ellipse cx="256" cy="304" rx="16" ry="10" fill="#ffaaa0"/>
+  <path d="M192 352 Q256 416 320 352" fill="none" stroke="#237a76" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="136" cy="224" r="12" fill="#fff"/>
+  <circle cx="376" cy="224" r="12" fill="#fff"/>
 </svg>

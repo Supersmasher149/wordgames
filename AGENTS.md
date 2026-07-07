@@ -2,45 +2,58 @@
 
 ## Commands
 
-- Install: `npm install`.
-- Dev server: `npm run dev`.
-- Production verification: `npm run build` runs `tsc -b && vite build`.
-- Lint: `npm run lint` runs `oxlint`.
-- There is no test script in `package.json`; use `npm run build` plus `npm run lint` for current verification.
-- Service worker registration is production-only; use `npm run build` plus `npm run preview` to manually test install/offline behavior.
+- Install: `npm install`
+- Dev server: `npm run dev` (Vite, serves at `/wordgames/`)
+- Build: `npm run build` runs `tsc -b && vite build`
+- Lint: `npm run lint` runs `oxlint`
+- Preview: `npm run preview` (Vite preview of production build)
+- Validate levels: `npm run validate-levels` (node with `--experimental-strip-types`)
+- No test script in `package.json`; use `build + lint` for verification
+- Service worker is production-only; use `build + preview` to test offline behavior
+
+## Vite Config
+
+- `vite.config.ts` sets `base: '/wordgames/'` — dev and prod both serve at this subpath
+- Service worker registers with `scope: '/wordgames/'` (`src/registerServiceWorker.ts`)
 
 ## Architecture Notes
 
-- App entrypoint is `src/App.tsx`; it wires screen selection, settings, active level, and persisted progress.
-- Level data source of truth is `src/data/levels.json`; `src/data/levels.ts` only casts and validates it.
-- Dictionary source of truth is `src/data/dictionary.json`; level validation checks required and bonus words against it.
-- Puzzle rules live in `src/game/puzzleEngine.ts`; level schema and progress types live in `src/game/types.ts`.
-- Progress persistence is versioned client-only localStorage in `src/game/persistence.ts`; it also handles reset and JSON export/import.
-- Sound is intentionally just a hook in `src/game/sound.ts`, not real audio assets.
-- PWA files are dependency-free: `public/manifest.webmanifest`, `public/sw.js`, and `src/registerServiceWorker.ts`.
+- Entrypoint: `src/main.tsx` → `src/App.tsx` (wires screens, progress, pack/level resolution)
+- Level data source of truth: `src/data/packs/*.ts` (5 packs: beginner/easy/medium/hard/expert), NOT JSON
+- Each pack is a `readonly LevelData[]` with `{ id, title, letters, requiredWords }` (`src/game/types.ts`)
+- `solveGrid()` (`src/engine/gridSolver.ts`) auto-places required words in a crossword on every level load
+- Bonus words are discovered dynamically from the letter bag + dictionary (`src/game/bonusDiscovery.ts`)
+- Dictionary: `src/data/dictionary.json` loaded as a `Set` via `src/data/dictionary.ts`
+- Puzzle engine: `src/game/puzzleEngine.ts` — submission evaluation, grid building, hints
+- Persistence: `src/game/persistence.ts` — versioned localStorage (v2) with v1→v2 migration, JSON export/import, reset
+- Sound: `src/game/sound.ts` — hook dispatching custom DOM events, no real audio assets
+- PWA files: `public/sw.js`, `public/manifest.webmanifest`, `src/registerServiceWorker.ts`
+- App is branded as **Word Paws** (cat-themed)
 
 ## Level Data Gotchas
 
-- Adding or editing levels should be done in `src/data/levels.json`, not in UI components.
-- Importing `src/data/levels.ts` runs `validateLevels`; `npm run build` fails on invalid level data.
-- Validator catches duplicate words, unavailable letters, invalid placements, grid conflicts, and required words fully hidden by overlap.
-- Validator also requires level words to exist in `src/data/dictionary.json`.
-- Required words must be independently discoverable in the grid; do not place a required word entirely on top of other required words.
+- Edit packs in `src/data/packs/*.ts`, not JSON files
+- Level IDs must be unique **across all packs** (validated by `npm run validate-levels`)
+- Each level requires 4–7 letters, at least 1 required word (min 3 letters each)
+- CLI validator checks: letters bound, word spellable, dictionary membership, grid solvability, bonus discovery
+- Run `npm run validate-levels` after adding/changing levels; build does not auto-validate
+- `requiredWords` alone define the puzzle; the grid solver and bonus discovery are automatic
 
 ## Offline/PWA Gotchas
 
-- Do not add external API calls for game content; levels, dictionary, and saves are local by design.
-- `public/sw.js` caches same-origin production assets after first load and returns cached `index.html` for offline navigation.
-- Bump the service worker cache name in `public/sw.js` when changing cache behavior or core public assets.
-- Save data has a `version` field; migrate through `src/game/persistence.ts` instead of changing localStorage shape ad hoc.
+- No external API calls; levels, dictionary, and saves are fully local
+- `public/sw.js` caches `/wordgames/` assets on first production load; returns cached `index.html` on offline navigation
+- Bump `CACHE_NAME` in `public/sw.js` when cache behavior or core assets change
+- Save data has `version: 2`; migrate through `persistence.ts` instead of changing localStorage shape ad hoc
 
-## Mobile Interaction Gotchas
+## Mobile Interaction
 
-- `src/index.css` intentionally locks page scrolling (`html`, `body`, `#root`, `.app-shell`) so dragging the letter wheel never moves the page.
-- `.letter-wheel` and `.wheel-letter` use `touch-action: none`; preserve this for mobile drag behavior.
-- Letter wheel gesture logic is in `src/components/LetterWheel.tsx`; it supports drag-submit plus tap select/deselect fallback.
+- `src/index.css` locks page scrolling (`html`, `body`, `#root`, `.app-shell` have `overflow: hidden`)
+- `.letter-wheel` and `.wheel-letter` use `touch-action: none` — preserve for drag behavior
+- Letter wheel gesture logic is in `src/components/LetterWheel.tsx` (drag-submit + tap select/deselect)
 
-## Styling Scope
+## Styling
 
-- This app uses one global stylesheet, `src/index.css`; there are no CSS modules or Tailwind config.
-- Keep the portrait phone layout primary: crossword readable above, wheel reachable near the bottom, large touch targets.
+- Single global stylesheet: `src/index.css` (no CSS modules or Tailwind)
+- Cat-themed palette: teal, pink, gold, cream; cat ears decor on level card and modal; yarn-ball wheel
+- Portrait-first responsive layout: crossword above, wheel near bottom, 48px min touch targets on mobile

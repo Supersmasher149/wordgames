@@ -1,4 +1,4 @@
-const CACHE_NAME = 'word-grove-offline-v2'
+const CACHE_NAME = 'word-paws-offline-v1'
 const BASE = '/wordgames'
 const APP_SHELL = [
   `${BASE}/`,

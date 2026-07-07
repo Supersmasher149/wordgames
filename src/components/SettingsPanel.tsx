@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import gearSvg from '../assets/icons/gear.svg'
 
 type SettingsPanelProps = {
   muted: boolean
@@ -27,7 +28,7 @@ export function SettingsPanel({
     const link = document.createElement('a')
 
     link.href = url
-    link.download = `word-grove-save-${new Date().toISOString().slice(0, 10)}.json`
+    link.download = `word-paws-save-${new Date().toISOString().slice(0, 10)}.json`
     link.click()
     URL.revokeObjectURL(url)
     setMessage('Save file exported.')
@@ -58,7 +59,9 @@ export function SettingsPanel({
 
   return (
     <details className="settings-panel">
-      <summary>Settings</summary>
+      <summary>
+        <img src={gearSvg} alt="Settings" className="gear-icon" />
+      </summary>
       <div className="settings-content">
         <button type="button" onClick={onToggleMuted}>
           {muted ? 'Unmute sound' : 'Mute sound'}

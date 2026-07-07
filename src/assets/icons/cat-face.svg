@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="cat-face.svg">
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#4a2f24" flood-opacity="0.18"/></filter>
+    <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fffdf7"/><stop offset="100%" stop-color="#fff3e4"/></linearGradient>
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#52bbb6"/><stop offset="100%" stop-color="#237a76"/></linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe28a"/><stop offset="100%" stop-color="#ffc94d"/></linearGradient>
+    <linearGradient id="pinkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd8c7"/><stop offset="100%" stop-color="#ffaaa0"/></linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="54" fill="url(#creamGrad)" stroke="#dfb98f" stroke-width="5" filter="url(#softShadow)"/>
+  <path d="M25 42 L34 13 L52 36 Z" fill="#fff8ec" stroke="#4a2f24" stroke-width="4" stroke-linejoin="round"/><path d="M103 42 L94 13 L76 36 Z" fill="#fff8ec" stroke="#4a2f24" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M35 35 L38 24 L45 35 Z" fill="#ffaaa0" opacity="0.75"/><path d="M93 35 L90 24 L83 35 Z" fill="#ffaaa0" opacity="0.75"/>
+  <circle cx="45" cy="61" r="5" fill="#4a2f24"/><circle cx="83" cy="61" r="5" fill="#4a2f24"/>
+  <path d="M64 67 L58 74 H70 Z" fill="#ff8f8b"/><path d="M64 74 C58 83 47 82 43 75" fill="none" stroke="#4a2f24" stroke-width="4" stroke-linecap="round"/><path d="M64 74 C70 83 81 82 85 75" fill="none" stroke="#4a2f24" stroke-width="4" stroke-linecap="round"/>
+  <path d="M22 63 H42 M20 73 H42 M86 63 H106 M86 73 H108" stroke="#8a6b5b" stroke-width="3" stroke-linecap="round"/>
+</svg>

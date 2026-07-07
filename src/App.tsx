@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react'
 import { GameScreen } from './components/GameScreen'
+import { InstallBanner } from './components/InstallBanner'
 import { LevelEditor } from './components/LevelEditor'
 import { LevelSelect } from './components/LevelSelect'
 import { SettingsPanel } from './components/SettingsPanel'
+import { useInstallPrompt } from './game/installPrompt.ts'
 import { PACKS } from './data/packs/index.ts'
 import type { LevelData, PlayerProgress } from './game/types'
 import {
@@ -12,6 +14,10 @@ import {
   resetProgress,
   saveProgress,
 } from './game/persistence'
+import catFaceSvg from './assets/icons/cat-face.svg'
+import sleepingCatSvg from './assets/decor/sleeping-cat.svg'
+import catTreeSvg from './assets/decor/cat-tree.svg'
+import plantSvg from './assets/decor/plant.svg'
 
 function getLevelFromPacks(
   packId: string,
@@ -55,9 +61,11 @@ function App() {
   const [progress, setProgressState] = useState<PlayerProgress>(() => loadProgress())
   const [screen, setScreen] = useState<'game' | 'levels'>('game')
   const [showEditor, setShowEditor] = useState(false)
+  const { isInstallable, install, dismiss } = useInstallPrompt()
 
   const resolved = getLevelFromPacks(progress.currentPackId, progress.currentLevelIndex) ?? getFirstLevel()
   const activeLevel = resolved?.level ?? null
+  const hasNextLevel = resolved ? getNextLevel(resolved.packId, resolved.levelIndex) !== null : false
 
   const setProgress = useCallback((recipe: (progress: PlayerProgress) => PlayerProgress) => {
     setProgressState((current) => {
@@ -144,11 +152,18 @@ function App() {
     <div className="app-shell">
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
+      <div className="paw-decor-left" aria-hidden="true" />
+      <div className="paw-decor-right" aria-hidden="true" />
+      <img src={sleepingCatSvg} alt="" className="cat-scene-decor" aria-hidden="true" />
+      <img src={catTreeSvg} alt="" className="cat-tree-decor" aria-hidden="true" />
+      <img src={plantSvg} alt="" className="plant-decor" aria-hidden="true" />
 
       <header className="app-header">
         <button className="brand-button" type="button" onClick={() => setScreen('game')}>
-          <span className="brand-mark">WG</span>
-          <span>Word Grove</span>
+          <span className="brand-mark">
+            <img src={catFaceSvg} alt="" className="cat-logo" />
+          </span>
+          <span className="brand-text">Word Paws</span>
         </button>
         <SettingsPanel
           muted={progress.settings.soundMuted}
@@ -168,6 +183,8 @@ function App() {
         />
       </header>
 
+      {isInstallable && <InstallBanner onInstall={install} onDismiss={dismiss} />}
+
       {showEditor ? (
         <LevelEditor onClose={() => setShowEditor(false)} />
       ) : screen === 'levels' ? (
@@ -180,6 +197,7 @@ function App() {
           level={activeLevel}
           packId={resolved!.packId}
           levelIndex={resolved!.levelIndex}
+          hasNextLevel={hasNextLevel}
           onOpenLevels={onOpenLevels}
           onNextLevel={onNextLevel}
           onLevelComplete={handleLevelComplete}

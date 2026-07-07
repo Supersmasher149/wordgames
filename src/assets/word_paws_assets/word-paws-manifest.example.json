@@ -1,0 +1,17 @@
+{
+  "name": "Word Paws",
+  "short_name": "Word Paws",
+  "description": "A cozy offline cat-themed word puzzle game.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff3e4",
+  "theme_color": "#ffaaa0",
+  "icons": [
+    {
+      "src": "/assets/ui/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

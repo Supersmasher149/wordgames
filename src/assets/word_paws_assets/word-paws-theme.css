@@ -1,0 +1,32 @@
+:root {
+  --wp-bg-cream: #fff3e4;
+  --wp-warm-peach: #ffd8c7;
+  --wp-soft-pink: #ffaaa0;
+  --wp-primary: #3aa7a3;
+  --wp-primary-dark: #237a76;
+  --wp-gold: #ffc94d;
+  --wp-card: #fff8ec;
+  --wp-text: #4a2f24;
+  --wp-muted: #8a6b5b;
+  --wp-tile: #fffaf0;
+  --wp-tile-border: #dfb98f;
+  --wp-shadow: 0 16px 35px rgba(74, 47, 36, 0.16);
+  --wp-shadow-small: 0 8px 18px rgba(74, 47, 36, 0.13);
+  --wp-radius-card: 28px;
+  --wp-radius-pill: 999px;
+  --wp-font: "Nunito", "Quicksand", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.word-paws-bg {
+  min-height: 100dvh;
+  background: radial-gradient(circle at 15% 20%, rgba(255, 170, 160, .35), transparent 28%), radial-gradient(circle at 88% 10%, rgba(255, 201, 77, .24), transparent 24%), linear-gradient(180deg, #fff3e4 0%, #ffe7d8 52%, #fff8ec 100%);
+  color: var(--wp-text);
+  font-family: var(--wp-font);
+}
+.wp-card { background: rgba(255,248,236,.88); border: 1px solid rgba(223,185,143,.75); border-radius: var(--wp-radius-card); box-shadow: var(--wp-shadow); backdrop-filter: blur(14px); }
+.wp-button-primary { background: linear-gradient(180deg,#52bbb6 0%,#237a76 100%); color: #fff8ec; border: 1px solid rgba(35,122,118,.4); border-radius: var(--wp-radius-pill); box-shadow: var(--wp-shadow-small); }
+.wp-button-coral { background: linear-gradient(180deg,#ffd8c7 0%,#ffaaa0 100%); color: var(--wp-text); border: 1px solid rgba(223,125,113,.45); border-radius: var(--wp-radius-pill); box-shadow: var(--wp-shadow-small); }
+.wp-coin-pill { background: linear-gradient(180deg,#ffe28a 0%,#ffc94d 100%); border: 1px solid rgba(199,131,34,.45); color: var(--wp-text); border-radius: var(--wp-radius-pill); box-shadow: var(--wp-shadow-small); }
+.wp-tile { background: linear-gradient(180deg,#fffdf7 0%,var(--wp-tile) 100%); border: 1px solid var(--wp-tile-border); border-radius: 12px; box-shadow: inset 0 -3px 0 rgba(74,47,36,.08), var(--wp-shadow-small); color: var(--wp-text); }
+.wp-letter-disc { background: linear-gradient(180deg,#fffdf7 0%,#fff3e4 100%); border: 2px solid #dfb98f; border-radius: 50%; box-shadow: var(--wp-shadow-small); color: var(--wp-text); }
+.wp-letter-disc.is-selected { background: linear-gradient(180deg,#ffe28a 0%,#ffaaa0 100%); transform: scale(1.08); box-shadow: 0 0 0 7px rgba(255,170,160,.25), var(--wp-shadow-small); }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }

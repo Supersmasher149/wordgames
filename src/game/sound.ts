@@ -7,5 +7,5 @@ export function playSound(name: SoundName, muted: boolean) {
 
   // Hook point for future audio assets. Keeping this side-effect tiny makes
   // sound optional for PWA/mobile wrappers and friendly to browser autoplay rules.
-  window.dispatchEvent(new CustomEvent('word-grove-sound', { detail: name }))
+  window.dispatchEvent(new CustomEvent('word-paws-sound', { detail: name }))
 }

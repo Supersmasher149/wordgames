@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="cat-ears.svg">
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#4a2f24" flood-opacity="0.18"/></filter>
+    <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fffdf7"/><stop offset="100%" stop-color="#fff3e4"/></linearGradient>
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#52bbb6"/><stop offset="100%" stop-color="#237a76"/></linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe28a"/><stop offset="100%" stop-color="#ffc94d"/></linearGradient>
+    <linearGradient id="pinkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd8c7"/><stop offset="100%" stop-color="#ffaaa0"/></linearGradient>
+  </defs>
+  <path d="M14 96 C20 52 39 25 61 56 C77 25 99 52 114 96 Z" fill="#fff8ec" stroke="#dfb98f" stroke-width="5" stroke-linejoin="round"/><path d="M34 82 C39 59 48 47 58 62 M73 62 C83 47 92 59 97 82" fill="#ffaaa0" opacity="0.75"/>
+</svg>

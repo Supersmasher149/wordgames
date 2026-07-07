@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="bell.svg">
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#4a2f24" flood-opacity="0.18"/></filter>
+    <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fffdf7"/><stop offset="100%" stop-color="#fff3e4"/></linearGradient>
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#52bbb6"/><stop offset="100%" stop-color="#237a76"/></linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe28a"/><stop offset="100%" stop-color="#ffc94d"/></linearGradient>
+    <linearGradient id="pinkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd8c7"/><stop offset="100%" stop-color="#ffaaa0"/></linearGradient>
+  </defs>
+  <path d="M35 82 H93 C88 71 88 58 88 50 C88 36 78 25 64 25 C50 25 40 36 40 50 C40 58 40 71 35 82 Z" fill="url(#goldGrad)" stroke="#4a2f24" stroke-width="5" filter="url(#softShadow)"/><path d="M54 91 C57 101 71 101 74 91 Z" fill="#ffc94d" stroke="#4a2f24" stroke-width="5"/><path d="M58 24 C58 15 70 15 70 24" fill="none" stroke="#4a2f24" stroke-width="5" stroke-linecap="round"/>
+</svg>

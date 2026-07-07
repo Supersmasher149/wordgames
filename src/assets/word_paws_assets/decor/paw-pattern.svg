@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="paw-pattern.svg">
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#4a2f24" flood-opacity="0.18"/></filter>
+    <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fffdf7"/><stop offset="100%" stop-color="#fff3e4"/></linearGradient>
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#52bbb6"/><stop offset="100%" stop-color="#237a76"/></linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe28a"/><stop offset="100%" stop-color="#ffc94d"/></linearGradient>
+    <linearGradient id="pinkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffd8c7"/><stop offset="100%" stop-color="#ffaaa0"/></linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="none"/><g opacity="0.28" fill="#8a6b5b"><circle cx="30" cy="75" r="7"/><circle cx="18" cy="56" r="4"/><circle cx="28" cy="48" r="4"/><circle cx="39" cy="49" r="4"/><circle cx="49" cy="57" r="4"/><circle cx="95" cy="38" r="6"/><circle cx="84" cy="22" r="4"/><circle cx="94" cy="16" r="4"/><circle cx="104" cy="19" r="4"/><circle cx="111" cy="30" r="4"/></g>
+</svg>

@@ -210,7 +210,7 @@ export function importProgress(rawJson: string) {
   }
 
   if (Number(parsed.version ?? SAVE_DATA_VERSION) > SAVE_DATA_VERSION) {
-    throw new Error('Save file is from a newer version of Word Grove.')
+    throw new Error('Save file is from a newer version of Word Paws.')
   }
 
   return sanitizeProgress(parsed)

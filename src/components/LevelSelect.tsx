@@ -13,9 +13,9 @@ export function LevelSelect({
   return (
     <section className="level-select">
       <div className="section-heading">
-        <p className="eyebrow">Choose a trail</p>
-        <h1>Word Grove</h1>
-        <p>Unlocked packs stay available, so you can replay any completed puzzle.</p>
+        <p className="eyebrow">Choose a cozy puzzle</p>
+        <h1>Word Paws</h1>
+        <p>All completed puzzles stay unlocked. Play any time.</p>
       </div>
 
       <div className="pack-list">
