@@ -1,14 +1,22 @@
 import { useState } from 'react'
 import { levels } from './data/levels'
 import { GameScreen } from './components/GameScreen'
+import { LevelEditor } from './components/LevelEditor'
 import { LevelSelect } from './components/LevelSelect'
 import { SettingsPanel } from './components/SettingsPanel'
 import type { PlayerProgress } from './game/types'
-import { loadProgress, resetProgress, saveProgress } from './game/persistence'
+import {
+  exportProgress,
+  importProgress,
+  loadProgress,
+  resetProgress,
+  saveProgress,
+} from './game/persistence'
 
 function App() {
   const [progress, setProgressState] = useState<PlayerProgress>(() => loadProgress())
   const [screen, setScreen] = useState<'game' | 'levels'>('game')
+  const [showEditor, setShowEditor] = useState(false)
   const [activeLevelId, setActiveLevelId] = useState(progress.currentLevelId)
   const activeLevel =
     levels.find((level) => level.id === activeLevelId) ?? levels[0]
@@ -34,6 +42,16 @@ function App() {
     setScreen('game')
   }
 
+  const handleExportSave = () => exportProgress(progress)
+
+  const handleImportSave = (rawJson: string) => {
+    const next = importProgress(rawJson)
+    saveProgress(next)
+    setProgressState(next)
+    setActiveLevelId(next.currentLevelId)
+    setScreen('game')
+  }
+
   return (
     <div className="app-shell">
       <div className="ambient ambient-one" />
@@ -45,20 +63,32 @@ function App() {
           <span>Word Grove</span>
         </button>
         <SettingsPanel
-          muted={progress.muted}
+          muted={progress.settings.soundMuted}
+          onExportSave={handleExportSave}
+          onImportSave={handleImportSave}
+          onOpenEditor={() => setShowEditor(true)}
           onReset={handleReset}
           onToggleMuted={() =>
-            setProgress((current) => ({ ...current, muted: !current.muted }))
+            setProgress((current) => ({
+              ...current,
+              settings: {
+                ...current.settings,
+                soundMuted: !current.settings.soundMuted,
+              },
+            }))
           }
         />
       </header>
 
-      {screen === 'levels' ? (
+      {showEditor ? (
+        <LevelEditor onClose={() => setShowEditor(false)} />
+      ) : screen === 'levels' ? (
         <LevelSelect
           completedLevelIds={progress.completedLevelIds}
           currentLevelId={progress.currentLevelId}
           levels={levels}
           onSelectLevel={startLevel}
+          unlockedLevelIds={progress.unlockedLevelIds}
         />
       ) : (
         <GameScreen

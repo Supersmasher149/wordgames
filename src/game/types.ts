@@ -26,12 +26,18 @@ export interface LevelProgress {
   revealedCells: RevealedCell[]
 }
 
+export interface PlayerSettings {
+  soundMuted: boolean
+}
+
 export interface PlayerProgress {
+  version: number
   currentLevelId: number
+  unlockedLevelIds: number[]
   completedLevelIds: number[]
   coins: number
   usedHints: number
-  muted: boolean
+  settings: PlayerSettings
   levels: Record<number, LevelProgress>
 }
 

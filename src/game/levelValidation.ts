@@ -1,5 +1,6 @@
 import type { Level, WordPlacement } from './types'
 import { getCellKey, getPlacementCells, normalizeWord } from './puzzleEngine'
+import { isDictionaryWord } from '../data/dictionary'
 
 export type LevelValidationIssue = {
   levelId: number
@@ -28,6 +29,7 @@ export function validateLevel(level: Level) {
   const requiredWords = new Set<string>()
   const allWords = new Set<string>()
   const occupiedCells = new Map<string, string>()
+  const placementCells: Array<{ word: string; keys: string[] }> = []
 
   if (!Number.isInteger(level.id) || level.id <= 0) {
     issues.push({ levelId: level.id, message: 'Level id must be a positive integer.' })
@@ -67,7 +69,14 @@ export function validateLevel(level: Level) {
       })
     }
 
+    if (!isDictionaryWord(word)) {
+      issues.push({ levelId: level.id, message: `Required word ${word} is missing from dictionary.` })
+    }
+
     issues.push(...validatePlacement(level.id, placement))
+    const cellKeys = getPlacementCells(placement).map(getCellKey)
+    placementCells.push({ word, keys: cellKeys })
+
     getPlacementCells(placement).forEach((cell, index) => {
       const key = getCellKey(cell)
       const letter = word[index]
@@ -82,6 +91,21 @@ export function validateLevel(level: Level) {
 
       occupiedCells.set(key, letter)
     })
+  }
+
+  for (const placement of placementCells) {
+    const isFullyCovered = placement.keys.every((key) =>
+      placementCells.some(
+        (candidate) => candidate.word !== placement.word && candidate.keys.includes(key),
+      ),
+    )
+
+    if (isFullyCovered) {
+      issues.push({
+        levelId: level.id,
+        message: `Required word ${placement.word} is fully overlapped by other required words.`,
+      })
+    }
   }
 
   for (const rawBonusWord of level.bonusWords) {
@@ -103,6 +127,10 @@ export function validateLevel(level: Level) {
         levelId: level.id,
         message: `Bonus word ${bonusWord} cannot be made from available letters.`,
       })
+    }
+
+    if (!isDictionaryWord(bonusWord)) {
+      issues.push({ levelId: level.id, message: `Bonus word ${bonusWord} is missing from dictionary.` })
     }
   }
 

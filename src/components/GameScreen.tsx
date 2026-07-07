@@ -76,6 +76,10 @@ export function GameScreen({
       setProgress((current) => ({
         ...current,
         coins: current.coins + (completed ? 25 : 5),
+        unlockedLevelIds:
+          completed && nextLevel && !current.unlockedLevelIds.includes(nextLevel.id)
+            ? [...current.unlockedLevelIds, nextLevel.id]
+            : current.unlockedLevelIds,
         completedLevelIds:
           completed && !current.completedLevelIds.includes(level.id)
             ? [...current.completedLevelIds, level.id]
@@ -91,7 +95,7 @@ export function GameScreen({
         setRecentWord((current) => (current === result.word ? null : current))
       }, 950)
       showFeedback('success', `${result.word} fills the grid.`)
-      playSound(completed ? 'complete' : 'correct', progress.muted)
+      playSound(completed ? 'complete' : 'correct', progress.settings.soundMuted)
 
       if (completed) {
         window.setTimeout(() => setShowComplete(true), 450)
@@ -113,7 +117,7 @@ export function GameScreen({
         },
       }))
       showFeedback('bonus', `${result.word} is a bonus word: +${result.coins} coins.`)
-      playSound('bonus', progress.muted)
+      playSound('bonus', progress.settings.soundMuted)
       return
     }
 
@@ -123,7 +127,7 @@ export function GameScreen({
         ? `${result.word} was already found. Try a new word.`
         : `${result.word || 'That'} is not in this puzzle.`,
     )
-    playSound('invalid', progress.muted)
+    playSound('invalid', progress.settings.soundMuted)
   }
 
   const shuffleLetters = () => {
@@ -159,7 +163,7 @@ export function GameScreen({
       },
     }))
     showFeedback('success', 'A hidden letter catches the light.')
-    playSound('hint', progress.muted)
+    playSound('hint', progress.settings.soundMuted)
   }
 
   const goToNextLevel = () => {

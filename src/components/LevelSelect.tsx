@@ -2,6 +2,7 @@ import type { Level } from '../game/types'
 
 type LevelSelectProps = {
   levels: Level[]
+  unlockedLevelIds: number[]
   completedLevelIds: number[]
   currentLevelId: number
   onSelectLevel: (levelId: number) => void
@@ -9,19 +10,11 @@ type LevelSelectProps = {
 
 export function LevelSelect({
   levels,
+  unlockedLevelIds,
   completedLevelIds,
   currentLevelId,
   onSelectLevel,
 }: LevelSelectProps) {
-  const isUnlocked = (levelId: number) => {
-    if (levelId === levels[0]?.id) {
-      return true
-    }
-
-    const previousLevel = levels[levels.findIndex((level) => level.id === levelId) - 1]
-    return Boolean(previousLevel && completedLevelIds.includes(previousLevel.id))
-  }
-
   return (
     <section className="level-select">
       <div className="section-heading">
@@ -31,7 +24,7 @@ export function LevelSelect({
       </div>
       <div className="level-list">
         {levels.map((level) => {
-          const unlocked = isUnlocked(level.id)
+          const unlocked = unlockedLevelIds.includes(level.id)
           const completed = completedLevelIds.includes(level.id)
 
           return (

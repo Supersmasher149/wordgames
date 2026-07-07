@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Word Grove app icon">
+  <rect width="192" height="192" rx="48" fill="#d7eddf" />
+  <circle cx="61" cy="62" r="30" fill="#ffd783" />
+  <circle cx="126" cy="72" r="42" fill="#8cc98b" />
+  <path d="M42 132c24-47 75-64 116-45-20 47-76 67-116 45Z" fill="#2f8f74" />
+  <text x="96" y="119" text-anchor="middle" font-family="Arial, sans-serif" font-size="49" font-weight="800" fill="#fffaf0">WG</text>
+</svg>
