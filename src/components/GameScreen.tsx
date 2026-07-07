@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
-import { levels } from '../data/levels'
-import type { Level, PlayerProgress } from '../game/types'
+import { useEffect, useMemo, useState } from 'react'
+import type { Level, LevelData, PlayerProgress } from '../game/types'
 import {
   evaluateSubmission,
   getHintCell,
@@ -9,16 +8,21 @@ import {
 } from '../game/puzzleEngine'
 import { getLevelProgress } from '../game/persistence'
 import { playSound } from '../game/sound'
+import { solveGrid } from '../engine/gridSolver.ts'
+import { discoverAllValidBonusWords, deduplicateAndFilterBonuses } from '../game/bonusDiscovery.ts'
 import { CrosswordGrid } from './CrosswordGrid'
 import { LetterWheel } from './LetterWheel'
 import { LevelCompleteModal } from './LevelCompleteModal'
 
 type GameScreenProps = {
-  level: Level
+  level: LevelData
+  packId: string
+  levelIndex: number
   progress: PlayerProgress
   setProgress: (recipe: (progress: PlayerProgress) => PlayerProgress) => void
   onOpenLevels: () => void
-  onStartLevel: (levelId: number) => void
+  onNextLevel: () => void
+  onLevelComplete: (packId: string, levelIndex: number) => void
 }
 
 type Feedback = {
@@ -27,13 +31,36 @@ type Feedback = {
   message: string
 }
 
+function buildLevelFromData(levelData: LevelData): Level | null {
+  const placements = solveGrid(levelData.letters, levelData.requiredWords)
+  if (!placements) return null
+
+  const bonusCandidates = discoverAllValidBonusWords(levelData.letters)
+  const bonusWords = deduplicateAndFilterBonuses(
+    new Set(levelData.requiredWords),
+    bonusCandidates,
+  )
+
+  return {
+    id: levelData.id,
+    title: levelData.title,
+    letters: [...levelData.letters],
+    words: placements,
+    bonusWords,
+  }
+}
+
 export function GameScreen({
   level,
+  packId,
+  levelIndex,
   progress,
   setProgress,
   onOpenLevels,
-  onStartLevel,
+  onNextLevel,
+  onLevelComplete,
 }: GameScreenProps) {
+  const solvedLevel = useMemo(() => buildLevelFromData(level), [level])
   const [wheelLetters, setWheelLetters] = useState(level.letters)
   const [selectedWord, setSelectedWord] = useState('')
   const [feedback, setFeedback] = useState<Feedback>({
@@ -43,9 +70,6 @@ export function GameScreen({
   })
   const [recentWord, setRecentWord] = useState<string | null>(null)
   const [showComplete, setShowComplete] = useState(false)
-  const levelProgress = getLevelProgress(progress, level.id)
-  const foundCount = levelProgress.foundWords.length
-  const nextLevel = levels.find((candidate) => candidate.id === level.id + 1)
 
   useEffect(() => {
     setWheelLetters(level.letters)
@@ -59,36 +83,48 @@ export function GameScreen({
     setShowComplete(false)
   }, [level])
 
+  if (!solvedLevel) return null
+
+  const levelProgress = getLevelProgress(progress, level.id)
+  const foundCount = levelProgress.foundWords.length
+
   const showFeedback = (status: Feedback['status'], message: string) => {
     setFeedback((current) => ({ id: current.id + 1, status, message }))
   }
 
   const submitWord = (rawWord: string) => {
-    const result = evaluateSubmission(level, levelProgress, rawWord)
+    const result = evaluateSubmission(solvedLevel, levelProgress, rawWord)
 
     if (result.kind === 'required') {
       const updatedLevelProgress = {
         ...levelProgress,
         foundWords: [...levelProgress.foundWords, result.word],
       }
-      const completed = isLevelComplete(level, updatedLevelProgress)
+      const completed = isLevelComplete(solvedLevel, updatedLevelProgress)
 
-      setProgress((current) => ({
-        ...current,
-        coins: current.coins + (completed ? 25 : 5),
-        unlockedLevelIds:
-          completed && nextLevel && !current.unlockedLevelIds.includes(nextLevel.id)
-            ? [...current.unlockedLevelIds, nextLevel.id]
-            : current.unlockedLevelIds,
-        completedLevelIds:
-          completed && !current.completedLevelIds.includes(level.id)
-            ? [...current.completedLevelIds, level.id]
-            : current.completedLevelIds,
-        levels: {
-          ...current.levels,
-          [level.id]: updatedLevelProgress,
-        },
-      }))
+      setProgress((current) => {
+        let unlockedIds = current.unlockedLevelIds
+        let completedIds = current.completedLevelIds
+
+        if (completed && !current.completedLevelIds.includes(level.id)) {
+          completedIds = [...current.completedLevelIds, level.id]
+          const nextId = level.id + 1
+          if (!current.unlockedLevelIds.includes(nextId)) {
+            unlockedIds = [...current.unlockedLevelIds, nextId]
+          }
+        }
+
+        return {
+          ...current,
+          coins: current.coins + (completed ? 25 : 5),
+          unlockedLevelIds: unlockedIds,
+          completedLevelIds: completedIds,
+          levels: {
+            ...current.levels,
+            [level.id]: updatedLevelProgress,
+          },
+        }
+      })
 
       setRecentWord(result.word)
       window.setTimeout(() => {
@@ -98,6 +134,7 @@ export function GameScreen({
       playSound(completed ? 'complete' : 'correct', progress.settings.soundMuted)
 
       if (completed) {
+        onLevelComplete(packId, levelIndex)
         window.setTimeout(() => setShowComplete(true), 450)
       }
 
@@ -144,7 +181,7 @@ export function GameScreen({
   }
 
   const revealHint = () => {
-    const hint = getHintCell(level, levelProgress)
+    const hint = getHintCell(solvedLevel, levelProgress)
 
     if (!hint) {
       showFeedback('idle', 'Every visible clue is already revealed.')
@@ -166,15 +203,6 @@ export function GameScreen({
     playSound('hint', progress.settings.soundMuted)
   }
 
-  const goToNextLevel = () => {
-    if (!nextLevel) {
-      return
-    }
-
-    setProgress((current) => ({ ...current, currentLevelId: nextLevel.id }))
-    onStartLevel(nextLevel.id)
-  }
-
   return (
     <main className="game-screen">
       <section className="game-topbar">
@@ -191,13 +219,13 @@ export function GameScreen({
       <section className="game-board">
         <div className="progress-strip">
           <span>
-            {foundCount}/{level.words.length} words
+            {foundCount}/{solvedLevel.words.length} words
           </span>
           <span>{levelProgress.foundBonusWords.length} bonus</span>
           <span>{progress.usedHints} hints used</span>
         </div>
 
-        <CrosswordGrid level={level} progress={levelProgress} recentWord={recentWord} />
+        <CrosswordGrid level={solvedLevel} progress={levelProgress} recentWord={recentWord} />
 
         <div className={`feedback ${feedback.status}`} aria-live="polite">
           <strong>{selectedWord ? normalizeWord(selectedWord) : feedback.message}</strong>
@@ -224,9 +252,9 @@ export function GameScreen({
       {showComplete && (
         <LevelCompleteModal
           coins={progress.coins}
-          hasNextLevel={Boolean(nextLevel)}
+          hasNextLevel={true}
           onLevels={onOpenLevels}
-          onNext={goToNextLevel}
+          onNext={onNextLevel}
           title={level.title}
         />
       )}

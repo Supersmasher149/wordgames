@@ -35,10 +35,55 @@ export interface PlayerProgress {
   currentLevelId: number
   unlockedLevelIds: number[]
   completedLevelIds: number[]
+  currentPackId: string
+  currentLevelIndex: number
+  packsUnlocked: Record<string, boolean>
+  packsCompleted: Record<string, number>
   coins: number
   usedHints: number
   settings: PlayerSettings
   levels: Record<number, LevelProgress>
+}
+
+export interface LevelData {
+  id: number
+  title: string
+  letters: string[]
+  requiredWords: string[]
+}
+
+export type Difficulty = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert'
+
+export interface LevelPack {
+  id: string
+  displayName: string
+  description: string
+  difficulty: Difficulty
+}
+
+export interface PackDefinition {
+  pack: LevelPack
+  levels: readonly LevelData[]
+}
+
+export type ValidationSeverity = 'error' | 'warning' | 'info'
+
+export interface ValidationIssue {
+  severity: ValidationSeverity
+  packId: string
+  levelIndex: number
+  message: string
+  suggestion?: string
+}
+
+export type ValidationResult =
+  | { kind: 'pass' }
+  | { kind: 'fail'; issues: ValidationIssue[] }
+
+export type LegacyFlatIds = {
+  unlockedLevelIds: number[]
+  completedLevelIds: number[]
+  currentLevelId: number
 }
 
 export interface GridCell {

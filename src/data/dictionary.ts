@@ -1,4 +1,4 @@
-import rawDictionary from './dictionary.json'
+import rawDictionary from './dictionary.json' with { type: 'json' }
 
 export const dictionaryWords = new Set(
   (rawDictionary as string[]).map(normalizeDictionaryWord),

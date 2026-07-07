@@ -1,18 +1,13 @@
-import type { Level } from '../game/types'
+import { PACKS } from '../data/packs/index.ts'
+import type { PlayerProgress } from '../game/types'
 
 type LevelSelectProps = {
-  levels: Level[]
-  unlockedLevelIds: number[]
-  completedLevelIds: number[]
-  currentLevelId: number
-  onSelectLevel: (levelId: number) => void
+  progress: PlayerProgress
+  onSelectLevel: (packId: string, levelIndex: number) => void
 }
 
 export function LevelSelect({
-  levels,
-  unlockedLevelIds,
-  completedLevelIds,
-  currentLevelId,
+  progress,
   onSelectLevel,
 }: LevelSelectProps) {
   return (
@@ -20,29 +15,61 @@ export function LevelSelect({
       <div className="section-heading">
         <p className="eyebrow">Choose a trail</p>
         <h1>Word Grove</h1>
-        <p>Unlocked levels stay available, so you can replay any completed puzzle.</p>
+        <p>Unlocked packs stay available, so you can replay any completed puzzle.</p>
       </div>
-      <div className="level-list">
-        {levels.map((level) => {
-          const unlocked = unlockedLevelIds.includes(level.id)
-          const completed = completedLevelIds.includes(level.id)
+
+      <div className="pack-list">
+        {PACKS.map((packDef) => {
+          const packId = packDef.pack.id
+          const unlocked = Boolean(progress.packsUnlocked[packId])
+          const completedCount = progress.packsCompleted[packId] ?? 0
+          const totalCount = packDef.levels.length
+          const allCompleted = completedCount >= totalCount && totalCount > 0
 
           return (
-            <button
-              className={`level-card ${completed ? 'completed' : ''} ${
-                currentLevelId === level.id ? 'current' : ''
-              }`}
-              disabled={!unlocked}
-              key={level.id}
-              onClick={() => onSelectLevel(level.id)}
-              type="button"
+            <div
+              key={packId}
+              className={`pack-section ${allCompleted ? 'completed' : ''} ${unlocked ? '' : 'locked'}`}
             >
-              <span>Level {level.id}</span>
-              <strong>{level.title}</strong>
-              <small>
-                {completed ? 'Completed' : unlocked ? 'Unlocked' : 'Locked'}
-              </small>
-            </button>
+              <div className="pack-header">
+                <h2>{packDef.pack.displayName}</h2>
+                <p className="pack-description">{packDef.pack.description}</p>
+                <p className="pack-stats">
+                  {unlocked
+                    ? `${completedCount} / ${totalCount} completed`
+                    : 'Locked'}
+                </p>
+              </div>
+
+              {unlocked && (
+                <div className="level-list">
+                  {packDef.levels.map((level, index) => {
+                    const levelId = level.id
+                    const completed = progress.completedLevelIds.includes(levelId)
+                    const isCurrent =
+                      progress.currentPackId === packId &&
+                      progress.currentLevelIndex === index
+
+                    return (
+                      <button
+                        className={`level-card ${completed ? 'completed' : ''} ${
+                          isCurrent ? 'current' : ''
+                        }`}
+                        key={levelId}
+                        onClick={() => onSelectLevel(packId, index)}
+                        type="button"
+                      >
+                        <span>Level {levelId}</span>
+                        <strong>{level.title}</strong>
+                        <small>
+                          {completed ? 'Completed' : 'Unlocked'}
+                        </small>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           )
         })}
       </div>
