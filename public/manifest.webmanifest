@@ -9,6 +9,15 @@
   "orientation": "any",
   "background_color": "#1a1728",
   "theme_color": "#3aa7a3",
+  "screenshots": [
+    {
+      "src": "/screenshot-gameplay.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Gameplay on Word Paws — drag letters from the yarn ball wheel to find words in the crossword grid"
+    }
+  ],
   "icons": [
     {
       "src": "/favicon.svg",

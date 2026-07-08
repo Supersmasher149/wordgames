@@ -9,7 +9,7 @@ const STORAGE_KEY = 'word-paws-install-dismissed'
 
 export function useInstallPrompt() {
   const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null)
-  const [dismissed, setDismissed] = useState(() => sessionStorage.getItem(STORAGE_KEY) === 'true')
+  const [dismissed, setDismissed] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true')
   const [installed, setInstalled] = useState(() =>
     window.matchMedia('(display-mode: standalone)').matches,
   )
@@ -47,13 +47,13 @@ export function useInstallPrompt() {
 
     if (outcome === 'dismissed') {
       setDismissed(true)
-      sessionStorage.setItem(STORAGE_KEY, 'true')
+      localStorage.setItem(STORAGE_KEY, 'true')
     }
   }
 
   const dismiss = () => {
     setDismissed(true)
-    sessionStorage.setItem(STORAGE_KEY, 'true')
+    localStorage.setItem(STORAGE_KEY, 'true')
   }
 
   const isInstallable = !installed && !dismissed && promptEvent !== null

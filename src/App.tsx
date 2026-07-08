@@ -4,7 +4,9 @@ import { InstallBanner } from './components/InstallBanner'
 import { LevelEditor } from './components/LevelEditor'
 import { LevelSelect } from './components/LevelSelect'
 import { SettingsPanel } from './components/SettingsPanel'
+import { UpdateBanner } from './components/UpdateBanner'
 import { useInstallPrompt } from './game/installPrompt.ts'
+import { setOnUpdateReady, skipWaiting } from './registerServiceWorker'
 import { PACKS } from './data/packs/index.ts'
 import type { LevelData, PlayerProgress } from './game/types'
 import {
@@ -61,6 +63,7 @@ function App() {
   const [progress, setProgressState] = useState<PlayerProgress>(() => loadProgress())
   const [screen, setScreen] = useState<'game' | 'levels'>('game')
   const [showEditor, setShowEditor] = useState(false)
+  const [updateRegistration, setUpdateRegistration] = useState<ServiceWorkerRegistration | null>(null)
   const { isInstallable, install, dismiss } = useInstallPrompt()
 
   const resolved = getLevelFromPacks(progress.currentPackId, progress.currentLevelIndex) ?? getFirstLevel()
@@ -78,6 +81,17 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', progress.settings.darkMode ? 'dark' : 'light')
   }, [progress.settings.darkMode])
+
+  useEffect(() => {
+    setOnUpdateReady((reg) => setUpdateRegistration(reg))
+    return () => setOnUpdateReady(null)
+  }, [])
+
+  const handleSWUpdate = useCallback(() => {
+    if (!updateRegistration) return
+    skipWaiting(updateRegistration)
+    window.location.reload()
+  }, [updateRegistration])
 
   const startLevel = useCallback(
     (packId: string, levelIndex: number) => {
@@ -198,6 +212,7 @@ function App() {
       </header>
 
       {isInstallable && <InstallBanner onInstall={install} onDismiss={dismiss} />}
+      {updateRegistration && <UpdateBanner onUpdate={handleSWUpdate} />}
 
       {showEditor ? (
         <LevelEditor onClose={() => setShowEditor(false)} />

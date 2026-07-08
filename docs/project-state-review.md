@@ -7,12 +7,15 @@
 - **Auto Grid Solver** — Places required words into crossword layouts automatically
 - **Bonus Discovery** — Discovers formable words from the dictionary per level
 - **Persistence** — Versioned localStorage (v2), v1→v2 migration, JSON export/import, reset
-- **PWA Shell** — Service worker (cache-first, offline fallback), manifest, SVG icons
+- **PWA Shell** — Service worker (cache-first, offline fallback), manifest, SVG icons, install prompt banner
+- **SW Update Notification** — Detects new SW versions and shows a "Refresh to update" banner; user-initiated `skipWaiting()`
 - **Cat Theme** — Complete SVG asset set (decor, icons), animations, responsive portrait-first layout, `prefers-reduced-motion` support
 - **Level Editor** — Built-in tool for creating/testing levels
 - **Coin Economy** — Earn coins for words (5) and level completion (25), spend on hints (10)
 - **Pack Progression** — Unlock next pack when current pack is completed
 - **Settings** — Mute, export/import save, reset, level editor toggle
+- **Dark Mode** — Default-on dark theme with light/dark toggle in Settings, persisted preference
+- **Grid Solver** — Proximity-based island placement prevents spread-out puzzles (fixes level 13 layout bug)
 
 ## What's Incomplete / Issues ⚠️
 
@@ -29,9 +32,7 @@
 ### PWA-specific
 | Feature | Why |
 |---|---|
-| Install prompt | No `beforeinstallprompt` handler — users can't easily install the app |
-| SW update notification | New SW activates immediately via `skipWaiting()` but user gets no "update ready" prompt to refresh |
-| Splash screen | `manifest.webmanifest` lacks `description`, `screenshots`, proper `background_color` for OS splash |
+| Splash screen screenshot | `manifest.webmanifest` references `/screenshot-gameplay.png` which doesn't exist yet — needs a real 1080×1920 screenshot created |
 
 ### Gameplay / UX
 | Feature | Why |
@@ -41,7 +42,6 @@
 | Tutorial/onboarding | First-time users get no explanation of how the wheel, hints, or coins work |
 | Statistics dashboard | No aggregate stats (total words found, accuracy, hints used, time played) |
 | Level review | After completing a level, you can't see what words you found or what you missed |
-| Dark mode | No theme toggle — the cream/light palette is fixed |
 
 ### Robustness
 | Feature | Why |
