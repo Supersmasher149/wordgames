@@ -1,6 +1,7 @@
 import type { WordPlacement, Direction } from '../game/types.ts'
 
-const GRID_SIZE = 8
+const VIRTUAL_SIZE = 24
+const MID = Math.floor(VIRTUAL_SIZE / 2)
 
 interface PlacedCell {
   row: number
@@ -8,10 +9,148 @@ interface PlacedCell {
   letter: string
 }
 
-interface PlacementResult {
-  row: number
-  col: number
-  cells: PlacedCell[]
+function getWordCells(
+  word: string,
+  row: number,
+  col: number,
+  direction: Direction,
+): PlacedCell[] {
+  const cells: PlacedCell[] = []
+  for (let i = 0; i < word.length; i++) {
+    cells.push({
+      row: direction === 'horizontal' ? row : row + i,
+      col: direction === 'horizontal' ? col + i : col,
+      letter: word[i],
+    })
+  }
+  return cells
+}
+
+function canPlace(
+  grid: (string | null)[][],
+  word: string,
+  row: number,
+  col: number,
+  direction: Direction,
+): boolean {
+  const cells = getWordCells(word, row, col, direction)
+
+  // 1. Bounds and letter conflict check
+  for (const cell of cells) {
+    if (cell.row < 0 || cell.row >= VIRTUAL_SIZE || cell.col < 0 || cell.col >= VIRTUAL_SIZE) {
+      return false
+    }
+    const existing = grid[cell.row][cell.col]
+    if (existing !== null && existing !== cell.letter) {
+      return false
+    }
+  }
+
+  // 2. Slot boundary rules — cell before/after must be empty or out of bounds
+  if (direction === 'horizontal') {
+    const beforeCol = col - 1
+    if (beforeCol >= 0 && grid[row][beforeCol] !== null) return false
+    const afterCol = col + word.length
+    if (afterCol < VIRTUAL_SIZE && grid[row][afterCol] !== null) return false
+  } else {
+    const beforeRow = row - 1
+    if (beforeRow >= 0 && grid[beforeRow][col] !== null) return false
+    const afterRow = row + word.length
+    if (afterRow < VIRTUAL_SIZE && grid[afterRow][col] !== null) return false
+  }
+
+  // 3. Adjacent cell rules — for NEW cells only, perpendicular neighbors must be empty
+  for (const cell of cells) {
+    if (grid[cell.row][cell.col] !== null) {
+      // Existing cell (crossing) — already validated when placed
+      continue
+    }
+
+    if (direction === 'horizontal') {
+      if (cell.row - 1 >= 0 && grid[cell.row - 1][cell.col] !== null) return false
+      if (cell.row + 1 < VIRTUAL_SIZE && grid[cell.row + 1][cell.col] !== null) return false
+    } else {
+      if (cell.col - 1 >= 0 && grid[cell.row][cell.col - 1] !== null) return false
+      if (cell.col + 1 < VIRTUAL_SIZE && grid[cell.row][cell.col + 1] !== null) return false
+    }
+  }
+
+  return true
+}
+
+function doPlace(
+  grid: (string | null)[][],
+  word: string,
+  row: number,
+  col: number,
+  direction: Direction,
+): void {
+  for (let i = 0; i < word.length; i++) {
+    const r = direction === 'horizontal' ? row : row + i
+    const c = direction === 'horizontal' ? col + i : col
+    grid[r][c] = word[i]
+  }
+}
+
+function scanGridForFakeRuns(
+  grid: (string | null)[][],
+  placements: WordPlacement[],
+): { valid: boolean; message?: string } {
+  // Scan horizontal runs
+  for (let r = 0; r < VIRTUAL_SIZE; r++) {
+    let c = 0
+    while (c < VIRTUAL_SIZE) {
+      if (grid[r][c] === null) { c++; continue }
+      let end = c + 1
+      while (end < VIRTUAL_SIZE && grid[r][end] !== null) end++
+      const runLength = end - c
+      if (runLength >= 2) {
+        const runLetters: string[] = []
+        for (let i = c; i < end; i++) runLetters.push(grid[r][i]!)
+        const runWord = runLetters.join('')
+        const matches = placements.some(
+          (p) =>
+            p.direction === 'horizontal' &&
+            p.row === r &&
+            p.col === c &&
+            p.word === runWord,
+        )
+        if (!matches) {
+          return { valid: false, message: `Unintended horizontal run "${runWord}" at row ${r} col ${c}.` }
+        }
+      }
+      c = end
+    }
+  }
+
+  // Scan vertical runs
+  for (let c = 0; c < VIRTUAL_SIZE; c++) {
+    let r = 0
+    while (r < VIRTUAL_SIZE) {
+      if (grid[r][c] === null) { r++; continue }
+      let end = r + 1
+      while (end < VIRTUAL_SIZE && grid[end][c] !== null) end++
+      const runLength = end - r
+      if (runLength >= 2) {
+        const runLetters: string[] = []
+        for (let i = r; i < end; i++) runLetters.push(grid[i][c]!)
+        const runWord = runLetters.join('')
+        const matches = placements.some(
+          (p) =>
+            p.direction === 'vertical' &&
+            p.col === c &&
+            p.row === r &&
+            p.word === runWord,
+        )
+        if (!matches) {
+          return { valid: false, message: `Unintended vertical run "${runWord}" at col ${c} row ${r}.` }
+        }
+      }
+      r = end
+    }
+  }
+
+  return { valid: true }
 }
 
 export function solveGrid(
@@ -25,111 +164,123 @@ export function solveGrid(
     .sort((a, b) => b.length - a.length)
 
   const grid: (string | null)[][] = Array.from(
-    { length: GRID_SIZE },
-    () => Array(GRID_SIZE).fill(null),
+    { length: VIRTUAL_SIZE },
+    () => Array(VIRTUAL_SIZE).fill(null),
   )
 
-  const placed: Array<{ word: string; placement: WordPlacement; cells: PlacedCell[] }> = []
+  const placements: WordPlacement[] = []
 
+  // Place first word — longest, horizontal, centered
   const firstWord = sorted[0]
-  const firstCol = Math.max(0, Math.floor((GRID_SIZE - firstWord.length) / 2))
-  const firstRow = Math.floor((GRID_SIZE - 1) / 2)
+  const firstCol = MID - Math.floor(firstWord.length / 2)
+  const firstRow = MID
 
-  const firstCells: PlacedCell[] = []
-  for (let i = 0; i < firstWord.length; i++) {
-    grid[firstRow][firstCol + i] = firstWord[i]
-    firstCells.push({ row: firstRow, col: firstCol + i, letter: firstWord[i] })
+  if (!canPlace(grid, firstWord, firstRow, firstCol, 'horizontal')) {
+    let foundFirst = false
+    for (let r = 1; r < VIRTUAL_SIZE - 1 && !foundFirst; r++) {
+      for (let c = 1; c <= VIRTUAL_SIZE - firstWord.length - 1 && !foundFirst; c++) {
+        if (canPlace(grid, firstWord, r, c, 'horizontal')) {
+          doPlace(grid, firstWord, r, c, 'horizontal')
+          placements.push({ word: firstWord, row: r, col: c, direction: 'horizontal' })
+          foundFirst = true
+        }
+      }
+    }
+    if (!foundFirst) return null
+  } else {
+    doPlace(grid, firstWord, firstRow, firstCol, 'horizontal')
+    placements.push({ word: firstWord, row: firstRow, col: firstCol, direction: 'horizontal' })
   }
-  placed.push({
-    word: firstWord,
-    placement: { word: firstWord, row: firstRow, col: firstCol, direction: 'across' },
-    cells: firstCells,
-  })
 
-  for (let wIndex = 1; wIndex < sorted.length; wIndex++) {
-    const word = sorted[wIndex]
-    let best: { placement: WordPlacement; cells: PlacedCell[] } | null = null
+  // Place remaining words
+  for (let wi = 1; wi < sorted.length; wi++) {
+    const word = sorted[wi]
+    let placed = false
 
-    for (const existing of placed) {
-      for (let ei = 0; ei < existing.cells.length; ei++) {
-        const cell = existing.cells[ei]
-        for (let wi = 0; wi < word.length; wi++) {
-          if (word[wi] !== cell.letter) continue
+    // Strategy 1: Try crossings with existing words
+    for (const existing of placements) {
+      const existingCells = getWordCells(existing.word, existing.row, existing.col, existing.direction)
 
-          const acrossResult = tryPlace(word, 'across', cell.row, cell.col - wi, grid)
-          if (acrossResult && hasExistingOverlap(acrossResult.cells, grid)) {
-            if (!best || newCellsCount(acrossResult.cells, grid) > newCellsCount(best.cells, grid)) {
-              best = {
-                placement: { word, row: acrossResult.row, col: acrossResult.col, direction: 'across' },
-                cells: acrossResult.cells,
-              }
-            }
+      for (const eCell of existingCells) {
+        for (let wi2 = 0; wi2 < word.length; wi2++) {
+          if (word[wi2] !== eCell.letter) continue
+
+          // Try horizontal crossing
+          const hRow = eCell.row
+          const hCol = eCell.col - wi2
+          if (canPlace(grid, word, hRow, hCol, 'horizontal')) {
+            doPlace(grid, word, hRow, hCol, 'horizontal')
+            placements.push({ word, row: hRow, col: hCol, direction: 'horizontal' })
+            placed = true
+            break
           }
 
-          const downResult = tryPlace(word, 'down', cell.row - wi, cell.col, grid)
-          if (downResult && hasExistingOverlap(downResult.cells, grid)) {
-            if (!best || newCellsCount(downResult.cells, grid) > newCellsCount(best.cells, grid)) {
-              best = {
-                placement: { word, row: downResult.row, col: downResult.col, direction: 'down' },
-                cells: downResult.cells,
-              }
-            }
+          // Try vertical crossing
+          const vRow = eCell.row - wi2
+          const vCol = eCell.col
+          if (canPlace(grid, word, vRow, vCol, 'vertical')) {
+            doPlace(grid, word, vRow, vCol, 'vertical')
+            placements.push({ word, row: vRow, col: vCol, direction: 'vertical' })
+            placed = true
+            break
+          }
+        }
+        if (placed) break
+      }
+      if (placed) break
+    }
+
+    // Strategy 2: Try as a separated island
+    if (!placed) {
+      for (let r = 1; r < VIRTUAL_SIZE - 1 && !placed; r++) {
+        for (let c = 1; c <= VIRTUAL_SIZE - word.length - 1 && !placed; c++) {
+          if (canPlace(grid, word, r, c, 'horizontal')) {
+            doPlace(grid, word, r, c, 'horizontal')
+            placements.push({ word, row: r, col: c, direction: 'horizontal' })
+            placed = true
           }
         }
       }
     }
 
-    if (!best) return null
-
-    for (const cell of best.cells) {
-      grid[cell.row][cell.col] = cell.letter
+    if (!placed) {
+      for (let c = 1; c < VIRTUAL_SIZE - 1 && !placed; c++) {
+        for (let r = 1; r <= VIRTUAL_SIZE - word.length - 1 && !placed; r++) {
+          if (canPlace(grid, word, r, c, 'vertical')) {
+            doPlace(grid, word, r, c, 'vertical')
+            placements.push({ word, row: r, col: c, direction: 'vertical' })
+            placed = true
+          }
+        }
+      }
     }
-    placed.push({ word, placement: best.placement, cells: best.cells })
+
+    if (!placed) return null
+
+    // Full-grid scan after each placement
+    const scan = scanGridForFakeRuns(grid, placements)
+    if (!scan.valid) {
+      return null
+    }
   }
 
-  const minRow = Math.min(...placed.flatMap((p) => p.cells.map((c) => c.row)))
-  const minCol = Math.min(...placed.flatMap((p) => p.cells.map((c) => c.col)))
+  // Find bounds
+  let minRow = VIRTUAL_SIZE, maxRow = 0, minCol = VIRTUAL_SIZE, maxCol = 0
+  for (const p of placements) {
+    const cells = getWordCells(p.word, p.row, p.col, p.direction)
+    for (const c of cells) {
+      minRow = Math.min(minRow, c.row)
+      maxRow = Math.max(maxRow, c.row)
+      minCol = Math.min(minCol, c.col)
+      maxCol = Math.max(maxCol, c.col)
+    }
+  }
 
-  return placed.map((p) => ({
+  // Offset to 0-based
+  return placements.map((p) => ({
     word: p.word,
-    row: p.placement.row - minRow,
-    col: p.placement.col - minCol,
-    direction: p.placement.direction,
+    row: p.row - minRow,
+    col: p.col - minCol,
+    direction: p.direction as Direction,
   }))
-}
-
-function tryPlace(
-  word: string,
-  direction: Direction,
-  startRow: number,
-  startCol: number,
-  grid: (string | null)[][],
-): PlacementResult | null {
-  const cells: PlacedCell[] = []
-
-  for (let i = 0; i < word.length; i++) {
-    const row = direction === 'down' ? startRow + i : startRow
-    const col = direction === 'across' ? startCol + i : startCol
-
-    if (row < 0 || row >= GRID_SIZE || col < 0 || col >= GRID_SIZE) {
-      return null
-    }
-
-    const existing = grid[row][col]
-    if (existing !== null && existing !== word[i]) {
-      return null
-    }
-
-    cells.push({ row, col, letter: word[i] })
-  }
-
-  return { row: startRow, col: startCol, cells }
-}
-
-function hasExistingOverlap(cells: PlacedCell[], grid: (string | null)[][]): boolean {
-  return cells.some((c) => grid[c.row][c.col] !== null)
-}
-
-function newCellsCount(cells: PlacedCell[], grid: (string | null)[][]): number {
-  return cells.filter((c) => grid[c.row][c.col] === null).length
 }
