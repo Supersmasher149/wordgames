@@ -230,28 +230,45 @@ export function solveGrid(
       if (placed) break
     }
 
-    // Strategy 2: Try as a separated island
+    // Strategy 2: Try as a separated island, preferring proximity to existing cluster
     if (!placed) {
-      for (let r = 1; r < VIRTUAL_SIZE - 1 && !placed; r++) {
-        for (let c = 1; c <= VIRTUAL_SIZE - word.length - 1 && !placed; c++) {
+      let centerRow = 0, centerCol = 0, count = 0
+      for (const p of placements) {
+        const cells = getWordCells(p.word, p.row, p.col, p.direction)
+        for (const c of cells) {
+          centerRow += c.row
+          centerCol += c.col
+          count++
+        }
+      }
+      centerRow = Math.round(centerRow / count)
+      centerCol = Math.round(centerCol / count)
+
+      let bestPos: { row: number; col: number; direction: Direction } | null = null
+      let bestDist = Infinity
+
+      for (let r = 1; r < VIRTUAL_SIZE - 1; r++) {
+        for (let c = 1; c <= VIRTUAL_SIZE - word.length - 1; c++) {
           if (canPlace(grid, word, r, c, 'horizontal')) {
-            doPlace(grid, word, r, c, 'horizontal')
-            placements.push({ word, row: r, col: c, direction: 'horizontal' })
-            placed = true
+            const dist = Math.abs(r - centerRow) + Math.abs(c - centerCol)
+            if (dist < bestDist) { bestDist = dist; bestPos = { row: r, col: c, direction: 'horizontal' } }
           }
         }
       }
-    }
 
-    if (!placed) {
-      for (let c = 1; c < VIRTUAL_SIZE - 1 && !placed; c++) {
-        for (let r = 1; r <= VIRTUAL_SIZE - word.length - 1 && !placed; r++) {
+      for (let c = 1; c < VIRTUAL_SIZE - 1; c++) {
+        for (let r = 1; r <= VIRTUAL_SIZE - word.length - 1; r++) {
           if (canPlace(grid, word, r, c, 'vertical')) {
-            doPlace(grid, word, r, c, 'vertical')
-            placements.push({ word, row: r, col: c, direction: 'vertical' })
-            placed = true
+            const dist = Math.abs(r - centerRow) + Math.abs(c - centerCol)
+            if (dist < bestDist) { bestDist = dist; bestPos = { row: r, col: c, direction: 'vertical' } }
           }
         }
+      }
+
+      if (bestPos) {
+        doPlace(grid, word, bestPos.row, bestPos.col, bestPos.direction)
+        placements.push({ word, row: bestPos.row, col: bestPos.col, direction: bestPos.direction })
+        placed = true
       }
     }
 
