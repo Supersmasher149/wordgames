@@ -125,8 +125,8 @@ export function getHintCell(
 
 export function getPlacementCells(placement: WordPlacement): RevealedCell[] {
   return normalizeWord(placement.word).split('').map((_, index) => ({
-    row: placement.row + (placement.direction === 'down' ? index : 0),
-    col: placement.col + (placement.direction === 'across' ? index : 0),
+    row: placement.row + (placement.direction === 'vertical' ? index : 0),
+    col: placement.col + (placement.direction === 'horizontal' ? index : 0),
   }))
 }
 

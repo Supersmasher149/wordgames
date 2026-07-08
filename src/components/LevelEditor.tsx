@@ -27,7 +27,7 @@ export function LevelEditor({ onClose }: { onClose: () => void }) {
   const [nextWord, setNextWord] = useState('')
   const [nextRow, setNextRow] = useState(0)
   const [nextCol, setNextCol] = useState(0)
-  const [nextDirection, setNextDirection] = useState<Direction>('across')
+  const [nextDirection, setNextDirection] = useState<Direction>('horizontal')
   const [errors, setErrors] = useState<ValidationError[]>([])
   const [exportedJson, setExportedJson] = useState('')
   const [importRaw, setImportRaw] = useState('')
@@ -57,8 +57,8 @@ export function LevelEditor({ onClose }: { onClose: () => void }) {
     words.forEach((editorWord, wordIndex) => {
       const word = normalizeWord(editorWord.word)
       word.split('').forEach((letter, index) => {
-        const row = editorWord.row + (editorWord.direction === 'down' ? index : 0)
-        const col = editorWord.col + (editorWord.direction === 'across' ? index : 0)
+        const row = editorWord.row + (editorWord.direction === 'vertical' ? index : 0)
+        const col = editorWord.col + (editorWord.direction === 'horizontal' ? index : 0)
         const key = getCellKey({ row, col })
         const existing = map.get(key)
         if (existing && existing.letter !== letter) {
@@ -75,8 +75,8 @@ export function LevelEditor({ onClose }: { onClose: () => void }) {
     const bounds = { minRow: 0, maxRow: 0, minCol: 0, maxCol: 0 }
     for (const word of words) {
       const len = normalizeWord(word.word).length
-      const lastRow = word.row + (word.direction === 'down' ? len - 1 : 0)
-      const lastCol = word.col + (word.direction === 'across' ? len - 1 : 0)
+      const lastRow = word.row + (word.direction === 'vertical' ? len - 1 : 0)
+      const lastCol = word.col + (word.direction === 'horizontal' ? len - 1 : 0)
       bounds.minRow = Math.min(bounds.minRow, word.row)
       bounds.maxRow = Math.max(bounds.maxRow, lastRow)
       bounds.minCol = Math.min(bounds.minCol, word.col)
@@ -299,8 +299,8 @@ export function LevelEditor({ onClose }: { onClose: () => void }) {
                 value={nextDirection}
                 onChange={(event) => setNextDirection(event.currentTarget.value as Direction)}
               >
-                <option value="across">Across</option>
-                <option value="down">Down</option>
+                <option value="horizontal">Across</option>
+                <option value="vertical">Down</option>
               </select>
             </label>
           </div>
@@ -343,7 +343,7 @@ export function LevelEditor({ onClose }: { onClose: () => void }) {
                 <li key={index}>
                   <strong>{normalizeWord(editorWord.word)}</strong>
                   <span className="editor-word-meta">
-                    ({editorWord.row}, {editorWord.col}) {editorWord.direction === 'across' ? '→' : '↓'}
+                    ({editorWord.row}, {editorWord.col}) {editorWord.direction === 'horizontal' ? '→' : '↓'}
                   </span>
                   <button type="button" className="editor-remove" onClick={() => removeWord(index)}>
                     Remove
