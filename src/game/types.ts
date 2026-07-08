@@ -1,4 +1,6 @@
-export type Direction = 'across' | 'down'
+export type Direction = 'horizontal' | 'vertical'
+
+export type WordDirection = Direction
 
 export interface WordPlacement {
   word: string
@@ -50,6 +52,7 @@ export interface LevelData {
   title: string
   letters: string[]
   requiredWords: string[]
+  difficulty?: Difficulty
 }
 
 export type Difficulty = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert'
