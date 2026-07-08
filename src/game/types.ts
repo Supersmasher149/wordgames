@@ -30,6 +30,7 @@ export interface LevelProgress {
 
 export interface PlayerSettings {
   soundMuted: boolean
+  darkMode: boolean
 }
 
 export interface PlayerProgress {

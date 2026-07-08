@@ -3,7 +3,9 @@ import gearSvg from '../assets/icons/gear.svg'
 
 type SettingsPanelProps = {
   muted: boolean
+  darkMode: boolean
   onToggleMuted: () => void
+  onToggleDarkMode: () => void
   onReset: () => void
   onExportSave: () => string
   onImportSave: (rawJson: string) => void
@@ -12,7 +14,9 @@ type SettingsPanelProps = {
 
 export function SettingsPanel({
   muted,
+  darkMode,
   onToggleMuted,
+  onToggleDarkMode,
   onOpenEditor,
   onReset,
   onExportSave,
@@ -65,6 +69,9 @@ export function SettingsPanel({
       <div className="settings-content">
         <button type="button" onClick={onToggleMuted}>
           {muted ? 'Unmute sound' : 'Mute sound'}
+        </button>
+        <button type="button" onClick={onToggleDarkMode}>
+          {darkMode ? 'Light theme' : 'Dark theme'}
         </button>
         <button type="button" onClick={handleExport}>
           Export save

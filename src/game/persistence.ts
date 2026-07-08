@@ -37,7 +37,7 @@ export function createDefaultProgress(): PlayerProgress {
     packsCompleted: {},
     coins: 0,
     usedHints: 0,
-    settings: { soundMuted: false },
+    settings: { soundMuted: false, darkMode: true },
     levels: {},
   }
 }
@@ -354,7 +354,7 @@ function deriveUnlockedLevelIds(completedLevelIds: number[]) {
 
 function sanitizeSettings(raw: Record<string, unknown>) {
   const rawSettings = isRecord(raw.settings) ? raw.settings : {}
-  return { soundMuted: Boolean(rawSettings.soundMuted ?? raw.muted) }
+  return { soundMuted: Boolean(rawSettings.soundMuted ?? raw.muted), darkMode: rawSettings.darkMode !== false }
 }
 
 function uniqueWords(words: unknown) {

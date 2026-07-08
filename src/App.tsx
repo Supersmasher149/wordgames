@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { GameScreen } from './components/GameScreen'
 import { InstallBanner } from './components/InstallBanner'
 import { LevelEditor } from './components/LevelEditor'
@@ -74,6 +74,10 @@ function App() {
       return next
     })
   }, [])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', progress.settings.darkMode ? 'dark' : 'light')
+  }, [progress.settings.darkMode])
 
   const startLevel = useCallback(
     (packId: string, levelIndex: number) => {
@@ -167,6 +171,7 @@ function App() {
         </button>
         <SettingsPanel
           muted={progress.settings.soundMuted}
+          darkMode={progress.settings.darkMode}
           onExportSave={handleExportSave}
           onImportSave={handleImportSave}
           onOpenEditor={() => setShowEditor(true)}
@@ -177,6 +182,15 @@ function App() {
               settings: {
                 ...current.settings,
                 soundMuted: !current.settings.soundMuted,
+              },
+            }))
+          }
+          onToggleDarkMode={() =>
+            setProgress((current) => ({
+              ...current,
+              settings: {
+                ...current.settings,
+                darkMode: !current.settings.darkMode,
               },
             }))
           }
