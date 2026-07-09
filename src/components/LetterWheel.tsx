@@ -22,6 +22,9 @@ export function LetterWheel({
   onWordChange,
 }: LetterWheelProps) {
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([])
+  const [dragPoint, setDragPoint] = useState<{ x: number; y: number } | null>(
+    null,
+  )
   const wheelRef = useRef<HTMLDivElement | null>(null)
   const selectedRef = useRef<number[]>([])
   const movedRef = useRef(false)
@@ -29,6 +32,15 @@ export function LetterWheel({
   const startIndexRef = useRef<number | null>(null)
   const startedSelectedRef = useRef(false)
   const startRef = useRef({ x: 0, y: 0 })
+
+  const getLocalPoint = (clientX: number, clientY: number) => {
+    const rect = wheelRef.current?.getBoundingClientRect()
+    if (!rect) return null
+    return {
+      x: ((clientX - rect.left) / rect.width) * 100,
+      y: ((clientY - rect.top) / rect.height) * 100,
+    }
+  }
 
   useEffect(() => {
     selectedRef.current = selectedIndexes
@@ -90,6 +102,7 @@ export function LetterWheel({
     startedSelectedRef.current = selectedRef.current.includes(index)
     movedRef.current = false
     isDraggingRef.current = true
+    setDragPoint(getLocalPoint(event.clientX, event.clientY))
 
     if (!startedSelectedRef.current) {
       addIndex(index)
@@ -109,6 +122,8 @@ export function LetterWheel({
     if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
       movedRef.current = true
     }
+
+    setDragPoint(getLocalPoint(event.clientX, event.clientY))
 
     const element = document.elementFromPoint(event.clientX, event.clientY)
     const letterButton = element?.closest<HTMLButtonElement>('[data-wheel-index]')
@@ -131,6 +146,7 @@ export function LetterWheel({
 
     document.body.classList.remove('is-wheel-dragging')
     isDraggingRef.current = false
+    setDragPoint(null)
 
     if (movedRef.current && selectedRef.current.length > 1) {
       submitSelected()
@@ -143,8 +159,13 @@ export function LetterWheel({
 
   const selectedWord = selectedIndexes.map((index) => letters[index]).join('')
   const positions = letters.map((_, index) => getLetterPosition(index, letters.length))
-  const selectedPoints = selectedIndexes
-    .map((index) => positions[index])
+
+  const pathPoints = selectedIndexes.map((index) => positions[index])
+  if (dragPoint) {
+    pathPoints.push(dragPoint)
+  }
+
+  const selectedPoints = pathPoints
     .map((position) => `${position.x},${position.y}`)
     .join(' ')
 
