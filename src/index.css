@@ -215,10 +215,12 @@ html {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: none;
+  height: auto;
 }
 
 body {
   min-height: 100dvh;
+  height: auto;
   margin: 0;
   min-width: 320px;
   overscroll-behavior: none;
@@ -276,6 +278,8 @@ p {
 
 #root {
   min-height: 100dvh;
+  height: auto;
+  max-height: none;
 }
 
 /* ==============================
@@ -286,6 +290,8 @@ p {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
+  height: auto;
+  max-height: none;
   isolation: isolate;
   padding: clamp(0.4rem, 1.2vw, 0.75rem);
   padding-top: max(env(safe-area-inset-top), clamp(0.4rem, 1.2vw, 0.75rem));
@@ -753,10 +759,9 @@ p {
   border-radius: 2rem;
   display: grid;
   gap: clamp(0.35rem, 1vh, 0.75rem);
-  grid-template-rows: auto 1fr auto auto auto;
+  grid-template-rows: auto auto auto auto auto;
   justify-items: center;
   min-height: 0;
-  overflow-x: hidden;
   padding: clamp(0.5rem, 1.5vw, 1rem);
 }
 
@@ -1410,6 +1415,22 @@ p {
   .plant-decor {
     display: block;
   }
+
+  /* Desktop wheel sizing responsive to height */
+  .letter-wheel {
+    width: min(clamp(220px, 28vh, 330px), 100%);
+  }
+
+  .wheel-letter {
+    font-size: clamp(1.2rem, 3.5vh, 1.75rem);
+    height: clamp(2.8rem, 12vh, 4.4rem);
+    width: clamp(2.8rem, 12vh, 4.4rem);
+  }
+
+  .game-board {
+    gap: clamp(0.35rem, 1.2vh, 0.75rem);
+    padding: clamp(0.5rem, 1.5vh, 1rem);
+  }
 }
 
 /* ==============================
@@ -1419,120 +1440,227 @@ p {
 
 @media (min-width: 900px) and (max-height: 900px) {
   :root {
-    --cell-size: clamp(30px, 5vh, 46px);
+    --cell-size: clamp(26px, 4.5vh, 42px);
   }
 
   .app-shell {
-    padding: clamp(0.25rem, 0.6vh, 0.5rem);
+    padding: clamp(0.2rem, 0.5vh, 0.4rem);
   }
 
   .app-header {
-    margin-bottom: 0.5rem;
-    padding: 0.35rem 0.5rem;
-    gap: 0.6rem;
-  }
-
-  .brand-mark {
-    width: 2.2rem;
-    height: 2.2rem;
-  }
-
-  .brand-text {
-    font-size: 1rem;
-  }
-
-  .settings-trigger {
-    width: 2.2rem;
-    height: 2.2rem;
-  }
-
-  .game-screen {
-    gap: 0.35rem;
-  }
-
-  .game-topbar {
-    padding: clamp(0.4rem, 1.2vh, 0.7rem);
+    margin-bottom: 0.35rem;
+    padding: 0.25rem 0.4rem;
     gap: 0.5rem;
   }
 
+  .brand-mark {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .brand-text {
+    font-size: 0.9rem;
+  }
+
+  .brand-button {
+    gap: 0.4rem;
+  }
+
+  .settings-trigger {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .game-screen {
+    gap: 0.25rem;
+  }
+
+  .game-topbar {
+    padding: clamp(0.3rem, 0.8vh, 0.5rem);
+    gap: 0.35rem;
+  }
+
   .game-topbar h1 {
-    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+  }
+
+  .eyebrow {
+    font-size: 0.65rem;
+  }
+
+  .level-title-block {
+    min-width: 0;
+  }
+
+  .levels-button {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.5rem;
+    min-height: 32px;
+  }
+
+  .coin-pill {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.5rem;
+    min-height: 32px;
+  }
+
+  .coin-icon {
+    width: 0.9rem;
+    height: 0.9rem;
   }
 
   .game-board {
-    padding: clamp(0.35rem, 1vh, 0.6rem);
-    gap: clamp(0.2rem, 0.6vh, 0.4rem);
+    padding: clamp(0.25rem, 0.7vh, 0.4rem);
+    gap: clamp(0.15rem, 0.4vh, 0.3rem);
+    border-radius: 1.4rem;
   }
 
   .crossword-panel {
-    padding: 0.15rem;
+    padding: 0.1rem;
   }
 
   .crossword-grid {
-    gap: 0.14rem;
+    gap: 0.12rem;
   }
 
   .crossword-row {
-    gap: 0.14rem;
+    gap: 0.12rem;
   }
 
   .grid-cell {
-    border-radius: clamp(0.3rem, 1vw, 0.5rem);
-    font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+    border-radius: clamp(0.25rem, 0.6vw, 0.4rem);
+    font-size: clamp(0.75rem, 2vh, 1.1rem);
   }
 
   .stats-row {
-    gap: 0.3rem;
+    gap: 0.25rem;
   }
 
   .stat-pill {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.45rem;
+    font-size: 0.68rem;
+    padding: 0.15rem 0.35rem;
+    min-height: auto;
+  }
+
+  .stat-icon {
+    width: 0.72rem;
+    height: 0.72rem;
   }
 
   .feedback {
-    font-size: 0.82rem;
-    min-height: 1.8rem;
-    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-height: 1.4rem;
+    padding: 0.15rem 0.4rem;
   }
 
   .power-actions {
-    gap: 0.4rem;
+    gap: 0.3rem;
   }
 
   .power-actions button {
-    font-size: 0.82rem;
-    min-height: 36px;
-    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    min-height: 30px;
+    padding: 0.25rem 0.5rem;
   }
 
   .letter-wheel {
-    width: min(clamp(190px, 24vh, 280px), 100%);
+    width: min(clamp(170px, 22vh, 250px), 100%);
   }
 
   .wheel-letter {
-    font-size: clamp(1rem, 3vw, 1.35rem);
-    height: clamp(2.5rem, 9vh, 3.2rem);
-    width: clamp(2.5rem, 9vh, 3.2rem);
+    font-size: clamp(0.85rem, 2.5vh, 1.2rem);
+    height: clamp(2rem, 7vh, 2.8rem);
+    width: clamp(2rem, 7vh, 2.8rem);
+  }
+
+  .wheel-letter small {
+    font-size: 0.5rem;
+    height: 0.85rem;
+    width: 0.85rem;
+    right: -0.05rem;
+    top: -0.05rem;
   }
 
   .selected-word {
-    font-size: 0.85rem;
-    min-height: 1.2rem;
+    font-size: 0.75rem;
+    min-height: 1rem;
   }
 
   .tap-actions {
-    gap: 0.4rem;
+    gap: 0.3rem;
   }
 
   .tap-actions button {
-    font-size: 0.82rem;
-    min-height: 36px;
-    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+    min-height: 30px;
+    padding: 0.25rem 0.5rem;
   }
 
   .wheel-panel {
-    gap: 0.3rem;
+    gap: 0.2rem;
+  }
+
+  .btn-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+  }
+
+  .paw-decor-left,
+  .paw-decor-right {
+    display: none;
+  }
+}
+
+/* Very short viewport: allow page scroll and minimal spacing */
+@media (max-height: 700px) {
+  .app-shell {
+    padding: 0.2rem;
+  }
+
+  .app-header {
+    margin-bottom: 0.25rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .game-screen {
+    gap: 0.2rem;
+  }
+
+  .game-topbar {
+    padding: 0.25rem 0.35rem;
+    gap: 0.25rem;
+  }
+
+  .game-topbar h1 {
+    font-size: clamp(0.9rem, 3vw, 1.2rem);
+  }
+
+  .game-board {
+    padding: 0.2rem;
+    gap: 0.15rem;
+  }
+
+  .letter-wheel {
+    width: min(clamp(140px, 20vh, 220px), 100%);
+  }
+
+  .wheel-letter {
+    font-size: clamp(0.75rem, 2vh, 1rem);
+    height: clamp(1.6rem, 6vh, 2.4rem);
+    width: clamp(1.6rem, 6vh, 2.4rem);
+  }
+
+  .power-actions button,
+  .tap-actions button {
+    font-size: 0.7rem;
+    min-height: 26px;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .feedback {
+    font-size: 0.7rem;
+    min-height: 1.2rem;
+    padding: 0.1rem 0.3rem;
   }
 
   .paw-decor-left,
