@@ -63,6 +63,7 @@ export interface LevelPack {
   displayName: string
   description: string
   difficulty: Difficulty
+  letterCount: number
 }
 
 export interface PackDefinition {

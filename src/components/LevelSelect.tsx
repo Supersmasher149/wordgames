@@ -32,12 +32,12 @@ export function LevelSelect({
               className={`pack-section ${allCompleted ? 'completed' : ''} ${unlocked ? '' : 'locked'}`}
             >
               <div className="pack-header">
-                <h2>{packDef.pack.displayName}</h2>
+                <h2>{packDef.pack.displayName} <span className="letter-badge">{packDef.pack.letterCount} letters</span></h2>
                 <p className="pack-description">{packDef.pack.description}</p>
                 <p className="pack-stats">
                   {unlocked
                     ? `${completedCount} / ${totalCount} completed`
-                    : 'Locked'}
+                    : `Locked - ${packDef.pack.letterCount} letters`}
                 </p>
               </div>
 

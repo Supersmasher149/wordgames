@@ -2,8 +2,8 @@ import type { LevelProgress, PlayerProgress } from './types.ts'
 import { createEmptyLevelProgress, normalizeWord } from './puzzleEngine.ts'
 import { PACKS } from '../data/packs/index.ts'
 
-const STORAGE_KEY = 'word-grove-progress-v2'
-export const SAVE_DATA_VERSION = 2
+const STORAGE_KEY = 'word-grove-progress-v3'
+export const SAVE_DATA_VERSION = 3
 
 const allLevelIds: number[] = []
 const levelIdToPack: Map<number, { packId: string; index: number }> = new Map()
@@ -54,14 +54,46 @@ export function loadProgress(): PlayerProgress {
     const saved = window.localStorage.getItem(STORAGE_KEY)
 
     if (!saved) {
-      const migrated = migrateV1()
-      if (migrated) return migrated
+      const migratedV2 = migrateV2()
+      if (migratedV2) return migratedV2
+
+      const migratedV1 = migrateV1()
+      if (migratedV1) return migratedV1
+
       return createDefaultProgress()
     }
 
     return sanitizeProgress(JSON.parse(saved))
   } catch {
     return createDefaultProgress()
+  }
+}
+
+const V2_STORAGE_KEY = 'word-grove-progress-v2'
+
+function migrateV2(): PlayerProgress | null {
+  try {
+    const v2Raw = window.localStorage.getItem(V2_STORAGE_KEY)
+    if (!v2Raw) return null
+
+    const v2 = JSON.parse(v2Raw)
+
+    const defaultProgress = createDefaultProgress()
+
+    // Preserve settings from v2
+    if (v2 && typeof v2 === 'object') {
+      const raw = v2 as Record<string, unknown>
+      if (raw.settings && typeof raw.settings === 'object') {
+        const s = raw.settings as Record<string, unknown>
+        defaultProgress.settings.soundMuted = Boolean(s.soundMuted)
+        defaultProgress.settings.darkMode = s.darkMode !== false
+      }
+    }
+
+    window.localStorage.removeItem(V2_STORAGE_KEY)
+    return defaultProgress
+  } catch {
+    return null
   }
 }
 

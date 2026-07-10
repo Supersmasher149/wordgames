@@ -1,7 +1,7 @@
 export const PACK_IDS = {
-  BEGINNER: 'BEGINNER',
-  EASY: 'EASY',
-  MEDIUM: 'MEDIUM',
-  HARD: 'HARD',
-  EXPERT: 'EXPERT',
+  FOUR_LETTER: 'four-letter',
+  FIVE_LETTER: 'five-letter',
+  SIX_LETTER: 'six-letter',
+  SEVEN_LETTER: 'seven-letter',
+  EIGHT_LETTER: 'eight-letter',
 } as const

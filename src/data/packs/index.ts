@@ -1,55 +1,60 @@
 import type { PackDefinition } from '../../game/types.ts'
 import { PACK_IDS } from './_utils.ts'
-import { beginnerPack } from './beginnerPack.ts'
-import { easyPack } from './easyPack.ts'
-import { mediumPack } from './mediumPack.ts'
-import { hardPack } from './hardPack.ts'
-import { expertPack } from './expertPack.ts'
+import { fourLetterPack } from './fourLetterPack.ts'
+import { fiveLetterPack } from './fiveLetterPack.ts'
+import { sixLetterPack } from './sixLetterPack.ts'
+import { sevenLetterPack } from './sevenLetterPack.ts'
+import { eightLetterPack } from './eightLetterPack.ts'
 
 export const PACKS: PackDefinition[] = [
   {
     pack: {
-      id: PACK_IDS.BEGINNER,
-      displayName: 'Beginner Pack',
-      description: 'Gentle introduction to word puzzles.',
+      id: PACK_IDS.FOUR_LETTER,
+      displayName: 'Kitten Steps',
+      description: '4-letter puzzles. Gentle introduction to word puzzling.',
       difficulty: 'beginner',
+      letterCount: 4,
     },
-    levels: beginnerPack,
+    levels: fourLetterPack,
   },
   {
     pack: {
-      id: PACK_IDS.EASY,
-      displayName: 'Easy Pack',
-      description: 'Build your word skills.',
+      id: PACK_IDS.FIVE_LETTER,
+      displayName: 'Paw Paths',
+      description: '5-letter puzzles. Build your word skills.',
       difficulty: 'easy',
+      letterCount: 5,
     },
-    levels: easyPack,
+    levels: fiveLetterPack,
   },
   {
     pack: {
-      id: PACK_IDS.MEDIUM,
-      displayName: 'Medium Pack',
-      description: 'Test your vocabulary.',
+      id: PACK_IDS.SIX_LETTER,
+      displayName: 'Yarn Trails',
+      description: '6-letter puzzles. Test your vocabulary.',
       difficulty: 'medium',
+      letterCount: 6,
     },
-    levels: mediumPack,
+    levels: sixLetterPack,
   },
   {
     pack: {
-      id: PACK_IDS.HARD,
-      displayName: 'Hard Pack',
-      description: 'Challenge your mind.',
+      id: PACK_IDS.SEVEN_LETTER,
+      displayName: 'Catnap Grove',
+      description: '7-letter puzzles. Challenge your mind.',
       difficulty: 'hard',
+      letterCount: 7,
     },
-    levels: hardPack,
+    levels: sevenLetterPack,
   },
   {
     pack: {
-      id: PACK_IDS.EXPERT,
-      displayName: 'Expert Pack',
-      description: 'For word masters only.',
+      id: PACK_IDS.EIGHT_LETTER,
+      displayName: 'Moonlit Paws',
+      description: '8-letter puzzles. For word masters only.',
       difficulty: 'expert',
+      letterCount: 8,
     },
-    levels: expertPack,
+    levels: eightLetterPack,
   },
 ]

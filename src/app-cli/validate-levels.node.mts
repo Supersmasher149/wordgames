@@ -223,12 +223,12 @@ function validatePlacements(
   return issues
 }
 
-const DIFFICULTY_LETTER_RANGES: Record<string, [number, number]> = {
-  beginner: [3, 4],
-  easy: [4, 5],
-  medium: [5, 6],
-  hard: [6, 7],
-  expert: [7, 7],
+const MIN_WORDS_BY_PACK: Record<string, number> = {
+  'four-letter': 4,
+  'five-letter': 5,
+  'six-letter': 7,
+  'seven-letter': 9,
+  'eight-letter': 11,
 }
 
 function validateLevelData(
@@ -236,32 +236,40 @@ function validateLevelData(
   levelIndex: number,
   level: LevelData,
   packDifficulty: string,
+  packLetterCount: number,
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = []
   const letters = level.letters.map((l) => l.toUpperCase())
   const requiredWords = level.requiredWords.map((w) => w.toUpperCase())
 
-  const difficulty = level.difficulty ?? packDifficulty
-
-  if (letters.length < 4 || letters.length > 7) {
+  // Check letter count matches pack
+  if (letters.length !== packLetterCount) {
     issues.push({
       severity: 'error',
       packId,
       levelIndex,
-      message: `Letters length (${letters.length}) must be between 4 and 7.`,
+      message: `Level has ${letters.length} wheel letters but belongs to the ${packLetterCount}-letter pack.`,
     })
   }
 
-  const letterRange = DIFFICULTY_LETTER_RANGES[difficulty]
-  if (letterRange) {
-    if (letters.length < letterRange[0] || letters.length > letterRange[1]) {
-      issues.push({
-        severity: 'warning',
-        packId,
-        levelIndex,
-        message: `Difficulty "${difficulty}" typically uses ${letterRange[0]}-${letterRange[1]} letters, got ${letters.length}.`,
-      })
-    }
+  if (letters.length < 4 || letters.length > 8) {
+    issues.push({
+      severity: 'error',
+      packId,
+      levelIndex,
+      message: `Letters length (${letters.length}) must be between 4 and 8.`,
+    })
+  }
+
+  // Check minimum required words
+  const minWords = MIN_WORDS_BY_PACK[packId] ?? 4
+  if (requiredWords.length < minWords) {
+    issues.push({
+      severity: 'error',
+      packId,
+      levelIndex,
+      message: `Level has only ${requiredWords.length} required word${requiredWords.length === 1 ? '' : 's'}. Minimum is ${minWords}.`,
+    })
   }
 
   if (requiredWords.length < 1) {
@@ -406,7 +414,7 @@ function validateAllPacks(): ValidationResult {
       }
       seenIds.set(level.id, packId)
 
-      issues.push(...validateLevelData(packId, i, level, packDifficulty))
+      issues.push(...validateLevelData(packId, i, level, packDifficulty, packDef.pack.letterCount))
     }
   }
 

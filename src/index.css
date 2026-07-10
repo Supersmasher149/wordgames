@@ -1168,6 +1168,20 @@ p {
   font-size: 1.4rem;
   letter-spacing: -0.03em;
   color: var(--teal-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.letter-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: var(--pink);
+  color: var(--white);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  letter-spacing: 0;
 }
 
 .pack-description {
